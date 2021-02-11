@@ -98,8 +98,7 @@
     (setq strings (append strings (list (substring sig (1+ cursor)))))))
 
 (defun npdoc--parse-def ()
-  "Parse a Python function definition and return an instance of
-the npdoc--def struct."
+  "Parse a Python function definition; return instance of npdoc--def."
   (let* ((start (progn
                   (python-nav-beginning-of-defun)
                   (point)))
@@ -165,6 +164,7 @@ the npdoc--def struct."
 
 ;;;###autoload
 (defun npdoc ()
+  "Generate NumPy style docstring for Python function."
   (interactive)
   (npdoc--insert (npdoc--parse-def) 4))
 
