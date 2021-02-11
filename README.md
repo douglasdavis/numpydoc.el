@@ -15,6 +15,7 @@ def histogram(
     weights: Optional[np.ndarray] = None,
     flow: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
+    pass
 ```
 
 After <kbd>M-x npdoc</kbd>:
