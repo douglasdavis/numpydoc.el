@@ -32,12 +32,12 @@
 (require 's)
 
 (cl-defstruct (npdoc--def (:constructor npdoc--def-create)
-                             (:copier nil))
+                          (:copier nil))
   args
   rtype)
 
 (cl-defstruct (npdoc--arg (:constructor npdoc--arg-create)
-                             (:copier nil))
+                          (:copier nil))
   name
   type
   default)
@@ -119,12 +119,12 @@
          ;; function args as strings
          (rawargs (-map (lambda (x) (s-trim x))
                         (npdoc--split-args (substring rawsig
-                                                         (1+ (s-index-of "(" rawsig))))))
+                                                      (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove if "" or "self"
          (args
           (-remove
            (lambda (x) (or (string= "" (npdoc--arg-name x))
-                      (string= "self" (npdoc--arg-name x))))
+                           (string= "self" (npdoc--arg-name x))))
            (-map (lambda (x) (npdoc--str-to-arg x)) rawargs))))
     (goto-char stop)
     (npdoc--def-create :args args :rtype rtype)))
@@ -145,10 +145,10 @@
         (let* ((name (npdoc--arg-name element))
                (type (npdoc--arg-type element)))
           (npdoc--indented-insert indent
-                                     (if type
-                                         (format "%s : %s\n"
-                                                 name type)
-                                       (format "%s\n" name)))
+                                  (if type
+                                      (format "%s : %s\n"
+                                              name type)
+                                    (format "%s\n" name)))
           (npdoc--indented-insert indent "   ADD\n"))))
     ;; return
     (when (npdoc--def-rtype fndef)
