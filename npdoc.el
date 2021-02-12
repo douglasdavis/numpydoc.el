@@ -42,14 +42,6 @@
   type
   default)
 
-(defun npdoc--all-but-last (s)
-  "Trim the last element out of string S."
-  (substring s 0 (1- (length s))))
-
-(defun npdoc--all-but-last-two (s)
-  "Trim the last two elements out of string S."
-  (substring s 0 (1- (1- (length s)))))
-
 (defun npdoc--indented-insert (n s)
   "Insert S with indentation N."
   (insert (format "%s%s" (make-string n ?\s) s)))
@@ -114,8 +106,8 @@
                     (s-chop-suffix ":" (s-trim (nth 1 parts)))
                   nil))
          ;; raw signature without return type as a string
-         (rawsig (cond (rtype (npdoc--all-but-last (s-trim (nth 0 parts))))
-                       (t (npdoc--all-but-last-two (s-trim (nth 0 parts))))))
+         (rawsig (cond (rtype (substring (s-trim (nth 0 parts)) 0 -1))
+                       (t (substring (s-trim (nth 0 parts)) 0 -2))))
          ;; function args as strings
          (rawargs (-map (lambda (x) (s-trim x))
                         (npdoc--split-args (substring rawsig
