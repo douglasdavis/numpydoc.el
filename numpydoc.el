@@ -125,8 +125,8 @@ function definition (`python-nav-end-of-statement')."
                         (numpydoc--split-args
                          (substring rawsig
                                     (1+ (s-index-of "(" rawsig))))))
-         ;; function args as a list of structures (remove if "" or "self"
-         (args (-remove (lambda (x) (-contains-p '("" "self")
+         ;; function args as a list of structures (remove some special cases)
+         (args (-remove (lambda (x) (-contains-p '("" "self" "*" "/")
                                             (numpydoc--arg-name x)))
                         (-map (lambda (x) (numpydoc--str-to-arg x)) rawargs))))
     (numpydoc--def-create :args args :rtype rtype)))
