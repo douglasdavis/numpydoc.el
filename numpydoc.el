@@ -52,30 +52,38 @@
          (and (s-contains-p ":" s) (s-contains-p "=" s))
          (let* ((comps1 (s-split ":" s))
                 (comps2 (s-split "=" (nth 1 comps1)))
-                (name (s-trim (nth 0 comps1)))
-                (type (s-trim (nth 0 comps2)))
+                (name (s-trim (car comps1)))
+                (type (s-trim (car comps2)))
                 (default (s-trim (nth 1 comps2))))
-           (numpydoc--arg-create :name name :type type :default default)))
+           (numpydoc--arg-create :name name
+                                 :type type
+                                 :default default)))
         ;; only a typehint
         ((s-contains-p ":" s)
          (let* ((comps1 (s-split ":" s))
-                (name (s-trim (nth 0 comps1)))
+                (name (s-trim (car comps1)))
                 (type (s-trim (nth 1 comps1))))
-           (numpydoc--arg-create :name name :type type :default nil)))
+           (numpydoc--arg-create :name name
+                                 :type type
+                                 :default nil)))
         ;; only a default value
         ((s-contains-p "=" s)
          (let* ((comps1 (s-split "=" s))
-                (name (s-trim (nth 0 comps1)))
+                (name (s-trim (car comps1)))
                 (default (s-trim (nth 1 comps1))))
-           (numpydoc--arg-create :name name :type nil :default default)))
+           (numpydoc--arg-create :name name
+                                 :type nil
+                                 :default default)))
         ;; only a name
-        (t (numpydoc--arg-create :name s :type nil :default nil))))
+        (t (numpydoc--arg-create :name s
+                                 :type nil
+                                 :default nil))))
 
 (defun numpydoc--split-args (sig)
   "Split SIG on comma while ignoring commas in type hint brackets."
   (let ((bc 0)
         (cursor -1)
-        (strings '()))
+        (strs '()))
     (dotimes (i (length sig))
       (let ((char (aref sig i)))
         (cond
@@ -84,10 +92,10 @@
          ((= char ?\])
           (setq bc (1- bc)))
          ((and (= char ?,) (= bc 0))
-          (setq strings (append strings (list (substring sig (1+ cursor) i))))
+          (setq strs (append strs (list (substring sig (1+ cursor) i))))
           (setq cursor i))
          )))
-    (setq strings (append strings (list (substring sig (1+ cursor)))))))
+    (setq strs (append strs (list (substring sig (1+ cursor)))))))
 
 (defun numpydoc--parse-def ()
   "Parse a Python function definition; return instance of numpydoc--def.
@@ -101,7 +109,8 @@ function definition (`python-nav-end-of-statement')."
                  (python-nav-end-of-statement)
                  (point)))
          ;; trimmed string of the function signature
-         (trimmed (s-collapse-whitespace (buffer-substring-no-properties start stop)))
+         (trimmed (s-collapse-whitespace (buffer-substring-no-properties
+                                          start stop)))
          ;; split into parts (args and return type)
          (parts (s-split "->" trimmed))
          ;; save return type as a string (or nil)
@@ -109,15 +118,16 @@ function definition (`python-nav-end-of-statement')."
                     (s-chop-suffix ":" (s-trim (nth 1 parts)))
                   nil))
          ;; raw signature without return type as a string
-         (rawsig (cond (rtype (substring (s-trim (nth 0 parts)) 0 -1))
-                       (t (substring (s-trim (nth 0 parts)) 0 -2))))
+         (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
+                       (t (substring (s-trim (car parts)) 0 -2))))
          ;; function args as strings
          (rawargs (-map (lambda (x) (s-trim x))
                         (numpydoc--split-args
                          (substring rawsig
                                     (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove if "" or "self"
-         (args (-remove (lambda (x) (-contains-p '("" "self") (numpydoc--arg-name x)))
+         (args (-remove (lambda (x) (-contains-p '("" "self")
+                                            (numpydoc--arg-name x)))
                         (-map (lambda (x) (numpydoc--str-to-arg x)) rawargs))))
     (numpydoc--def-create :args args :rtype rtype)))
 
