@@ -39,7 +39,7 @@
 (cl-defstruct numpydoc--arg
   name
   type
-  default)
+  defval)
 
 (defun numpydoc--indented-insert (n s)
   "Insert S with indentation N."
@@ -47,16 +47,15 @@
 
 (defun numpydoc--str-to-arg (s)
   "Convert S to a `numpydoc--arg' struct instance."
-  (cond (;; typehint and default value
-         (and (s-contains-p ":" s) (s-contains-p "=" s))
+  (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
          (let* ((comps1 (s-split ":" s))
                 (comps2 (s-split "=" (nth 1 comps1)))
                 (name (s-trim (car comps1)))
                 (type (s-trim (car comps2)))
-                (default (s-trim (nth 1 comps2))))
+                (defval (s-trim (nth 1 comps2))))
            (make-numpydoc--arg :name name
                                :type type
-                               :default default)))
+                               :defval defval)))
         ;; only a typehint
         ((s-contains-p ":" s)
          (let* ((comps1 (s-split ":" s))
@@ -64,19 +63,19 @@
                 (type (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type type
-                               :default nil)))
+                               :defval nil)))
         ;; only a default value
         ((s-contains-p "=" s)
          (let* ((comps1 (s-split "=" s))
                 (name (s-trim (car comps1)))
-                (default (s-trim (nth 1 comps1))))
+                (defval (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type nil
-                               :default default)))
+                               :defval defval)))
         ;; only a name
         (t (make-numpydoc--arg :name s
                                :type nil
-                               :default nil))))
+                               :defval nil))))
 
 (defun numpydoc--split-args (sig)
   "Split SIG on comma while ignoring commas in type hint brackets."
@@ -106,6 +105,8 @@ function definition (`python-nav-end-of-statement')."
          (stop (progn
                  (python-nav-end-of-statement)
                  (point)))
+         ;; args to ignore
+         (to-skip '("" "self" "*" ""))
          ;; trimmed string of the function signature
          (trimmed (s-collapse-whitespace (buffer-substring-no-properties
                                           start stop)))
@@ -119,14 +120,14 @@ function definition (`python-nav-end-of-statement')."
          (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
                        (t (substring (s-trim (car parts)) 0 -2))))
          ;; function args as strings
-         (rawargs (-map (lambda (x) (s-trim x))
+         (rawargs (-map #'s-trim
                         (numpydoc--split-args
                          (substring rawsig
                                     (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove some special cases)
-         (args (-remove (lambda (x) (-contains-p '("" "self" "*" "/")
-                                            (numpydoc--arg-name x)))
-                        (-map (lambda (x) (numpydoc--str-to-arg x)) rawargs))))
+         (args (-remove (lambda (x)
+                          (-contains-p to-skip (numpydoc--arg-name x)))
+                        (-map #'numpydoc--str-to-arg rawargs))))
     (make-numpydoc--def :args args :rtype rtype)))
 
 (defun numpydoc--existing-p ()
@@ -180,8 +181,9 @@ function definition (`python-nav-end-of-statement')."
                                                  name type)
                                        (format "%s\n" name)))
           (numpydoc--indented-insert indent "   ADD\n"))))
-    ;; return
-    (when (numpydoc--def-rtype fndef)
+    ;; return if non-nil and not "None"
+    (when (and (numpydoc--def-rtype fndef)
+               (not (string= (numpydoc--def-rtype fndef) "None")))
       (insert "\n")
       (numpydoc--indented-insert indent "Returns\n")
       (numpydoc--indented-insert indent "-------\n")
@@ -198,7 +200,7 @@ function definition (`python-nav-end-of-statement')."
     (numpydoc--indented-insert indent "\"\"\"")))
 
 ;;;###autoload
-(defun numpydoc-gen ()
+(defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (interactive)
   (let* ((cp (point))

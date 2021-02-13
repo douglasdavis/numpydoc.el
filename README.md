@@ -18,7 +18,7 @@ def histogram(
     pass
 ```
 
-After <kbd>M-x numpydoc</kbd>:
+After <kbd>M-x numpydoc-generate</kbd>:
 
 ```python
 def histogram(
