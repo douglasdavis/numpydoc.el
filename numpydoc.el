@@ -77,22 +77,19 @@
                                :type nil
                                :defval nil))))
 
-(defun numpydoc--split-args (sig)
-  "Split SIG on comma while ignoring commas in type hint brackets."
+(defun numpydoc--split-args (all-args)
+  "Split ALL-ARGS on comma delimiter but ignore commas in type brackets."
   (let ((bc 0)
         (cursor -1)
         (strs '()))
-    (dotimes (i (length sig))
-      (let ((char (aref sig i)))
-        (cond
-         ((= char ?\[)
-          (setq bc (1+ bc)))
-         ((= char ?\])
-          (setq bc (1- bc)))
-         ((and (= char ?,) (= bc 0))
-          (setq strs (append strs (list (substring sig (1+ cursor) i))))
-          (setq cursor i)))))
-    (setq strs (append strs (list (substring sig (1+ cursor)))))))
+    (dotimes (i (length all-args))
+      (let ((ichar (aref all-args i)))
+        (cond ((= ichar ?\[) (setq bc (1+ bc)))
+              ((= ichar ?\]) (setq bc (1- bc)))
+              ((and (= ichar ?,) (= bc 0))
+               (setq strs (append strs (list (substring all-args (1+ cursor) i))))
+               (setq cursor i)))))
+    (setq strs (append strs (list (substring all-args (1+ cursor)))))))
 
 (defun numpydoc--parse-def ()
   "Parse a Python function definition; return instance of numpydoc--def.
