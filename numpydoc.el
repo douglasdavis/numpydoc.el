@@ -1,10 +1,11 @@
-;;; numpydoc.el --- Insert NumPy style docstring.  -*- lexical-binding: t; -*-
+;;; numpydoc.el --- Insert NumPy style docstring  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  Doug Davis
 
 ;; Author: Doug Davis <ddavis@ddavis.io>
-;; Package-Version: "0.1.0"
-;; Package-Requires: ((dash "2.17.0") (s "1.12.0"))
+;; URL: https://github.com/douglasdavis/numpydoc.el
+;; Package-Version: 0.1.0
+;; Package-Requires: ((emacs "26.1") (dash "2.17.0") (s "1.12.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -93,8 +94,7 @@
           (setq bc (1- bc)))
          ((and (= char ?,) (= bc 0))
           (setq strs (append strs (list (substring sig (1+ cursor) i))))
-          (setq cursor i))
-         )))
+          (setq cursor i)))))
     (setq strs (append strs (list (substring sig (1+ cursor)))))))
 
 (defun numpydoc--parse-def ()
