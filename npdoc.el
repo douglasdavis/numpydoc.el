@@ -90,7 +90,10 @@
     (setq strings (append strings (list (substring sig (1+ cursor)))))))
 
 (defun npdoc--parse-def ()
-  "Parse a Python function definition; return instance of npdoc--def."
+  "Parse a Python function definition; return instance of npdoc--def.
+
+This function terminates with the cursor on the end of the python
+function definition (`python-nav-end-of-statement')."
   (let* ((start (progn
                   (python-nav-beginning-of-defun)
                   (point)))
@@ -113,14 +116,21 @@
                         (npdoc--split-args (substring rawsig
                                                       (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove if "" or "self"
-         (args
-          (-remove
-           (lambda (x) (or (string= "" (npdoc--arg-name x))
-                           (string= "self" (npdoc--arg-name x))))
-           (-map (lambda (x) (npdoc--str-to-arg x)) rawargs))))
-    (goto-char stop)
+         (args (-remove (lambda (x) (-contains-p '("" "self") (npdoc--arg-name x)))
+                        (-map (lambda (x) (npdoc--str-to-arg x)) rawargs))))
     (npdoc--def-create :args args :rtype rtype)))
 
+(defun npdoc--detect-indent ()
+  "Detect indentation level of current position's function."
+  (let* ((cp (point))
+         (beg (progn
+                (python-nav-beginning-of-defun)
+                (point)))
+         (ind (progn
+                (back-to-indentation)
+                (point))))
+    (goto-char cp)
+    (+ 4 (- ind beg))))
 
 (defun npdoc--insert (fndef indent)
   "Insert FNDEF with indentation level INDENT."
@@ -158,7 +168,10 @@
 (defun npdoc ()
   "Generate NumPy style docstring for Python function."
   (interactive)
-  (npdoc--insert (npdoc--parse-def) 4))
+  (let ((cp (point))
+        (indent (npdoc--detect-indent)))
+    (goto-char cp)
+    (npdoc--insert (npdoc--parse-def) indent)))
 
 (provide 'npdoc)
 ;;; npdoc.el ends here
