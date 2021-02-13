@@ -188,6 +188,11 @@ function definition (`python-nav-end-of-statement')."
       (numpydoc--indented-insert indent (numpydoc--def-rtype fndef))
       (insert "\n")
       (numpydoc--indented-insert indent "    ADD\n"))
+    ;; examples
+    (insert "\n")
+    (numpydoc--indented-insert indent "Examples\n")
+    (numpydoc--indented-insert indent "--------\n")
+    (numpydoc--indented-insert indent "ADD\n")
     ;; done
     (insert "\n")
     (numpydoc--indented-insert indent "\"\"\"")))
@@ -196,9 +201,9 @@ function definition (`python-nav-end-of-statement')."
 (defun numpydoc-gen ()
   "Generate NumPy style docstring for Python function."
   (interactive)
-  (let ((has-ds (numpydoc--existing-p))
-        (cp (point))
-        (indent (numpydoc--detect-indent)))
+  (let* ((cp (point))
+         (has-ds (numpydoc--existing-p))
+         (indent (numpydoc--detect-indent)))
     (goto-char cp)
     (if has-ds
         (message "Function already has a docstring.")

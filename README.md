@@ -50,6 +50,10 @@ def histogram(
     Tuple[np.ndarray, np.ndarray]
         ADD
 
+    Examples
+    --------
+    ADD
+
     """
     pass
 ```
