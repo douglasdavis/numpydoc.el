@@ -46,7 +46,7 @@
   (insert (format "%s%s" (make-string n ?\s) s)))
 
 (defun numpydoc--str-to-arg (s)
-  "Convert S to arg structure."
+  "Convert S to a `numpydoc--arg' struct instance."
   (cond (;; typehint and default value
          (and (s-contains-p ":" s) (s-contains-p "=" s))
          (let* ((comps1 (s-split ":" s))
