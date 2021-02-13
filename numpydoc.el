@@ -1,4 +1,4 @@
-;;; numpydoc.el --- Insert NumPy style docstring  -*- lexical-binding: t; -*-
+;;; numpydoc.el --- Insert NumPy style docstring     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  Doug Davis
 
