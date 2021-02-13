@@ -1,4 +1,4 @@
-;;; npdoc.el --- Insert NumPy style docstring.  -*- lexical-binding: t; -*-
+;;; numpydoc.el --- Insert NumPy style docstring.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  Doug Davis
 
@@ -31,22 +31,22 @@
 (require 'dash)
 (require 's)
 
-(cl-defstruct (npdoc--def (:constructor npdoc--def-create)
-                          (:copier nil))
+(cl-defstruct (numpydoc--def (:constructor numpydoc--def-create)
+                             (:copier nil))
   args
   rtype)
 
-(cl-defstruct (npdoc--arg (:constructor npdoc--arg-create)
-                          (:copier nil))
+(cl-defstruct (numpydoc--arg (:constructor numpydoc--arg-create)
+                             (:copier nil))
   name
   type
   default)
 
-(defun npdoc--indented-insert (n s)
+(defun numpydoc--indented-insert (n s)
   "Insert S with indentation N."
   (insert (format "%s%s" (make-string n ?\s) s)))
 
-(defun npdoc--str-to-arg (s)
+(defun numpydoc--str-to-arg (s)
   "Convert S to arg structure."
   (cond (;; typehint and default value
          (and (s-contains-p ":" s) (s-contains-p "=" s))
@@ -55,23 +55,23 @@
                 (name (s-trim (nth 0 comps1)))
                 (type (s-trim (nth 0 comps2)))
                 (default (s-trim (nth 1 comps2))))
-           (npdoc--arg-create :name name :type type :default default)))
+           (numpydoc--arg-create :name name :type type :default default)))
         ;; only a typehint
         ((s-contains-p ":" s)
          (let* ((comps1 (s-split ":" s))
                 (name (s-trim (nth 0 comps1)))
                 (type (s-trim (nth 1 comps1))))
-           (npdoc--arg-create :name name :type type :default nil)))
+           (numpydoc--arg-create :name name :type type :default nil)))
         ;; only a default value
         ((s-contains-p "=" s)
          (let* ((comps1 (s-split "=" s))
                 (name (s-trim (nth 0 comps1)))
                 (default (s-trim (nth 1 comps1))))
-           (npdoc--arg-create :name name :type nil :default default)))
+           (numpydoc--arg-create :name name :type nil :default default)))
         ;; only a name
-        (t (npdoc--arg-create :name s :type nil :default nil))))
+        (t (numpydoc--arg-create :name s :type nil :default nil))))
 
-(defun npdoc--split-args (sig)
+(defun numpydoc--split-args (sig)
   "Split SIG on comma while ignoring commas in type hint brackets."
   (let ((bc 0)
         (cursor -1)
@@ -89,8 +89,8 @@
          )))
     (setq strings (append strings (list (substring sig (1+ cursor)))))))
 
-(defun npdoc--parse-def ()
-  "Parse a Python function definition; return instance of npdoc--def.
+(defun numpydoc--parse-def ()
+  "Parse a Python function definition; return instance of numpydoc--def.
 
 This function terminates with the cursor on the end of the python
 function definition (`python-nav-end-of-statement')."
@@ -113,14 +113,15 @@ function definition (`python-nav-end-of-statement')."
                        (t (substring (s-trim (nth 0 parts)) 0 -2))))
          ;; function args as strings
          (rawargs (-map (lambda (x) (s-trim x))
-                        (npdoc--split-args (substring rawsig
-                                                      (1+ (s-index-of "(" rawsig))))))
+                        (numpydoc--split-args
+                         (substring rawsig
+                                    (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove if "" or "self"
-         (args (-remove (lambda (x) (-contains-p '("" "self") (npdoc--arg-name x)))
-                        (-map (lambda (x) (npdoc--str-to-arg x)) rawargs))))
-    (npdoc--def-create :args args :rtype rtype)))
+         (args (-remove (lambda (x) (-contains-p '("" "self") (numpydoc--arg-name x)))
+                        (-map (lambda (x) (numpydoc--str-to-arg x)) rawargs))))
+    (numpydoc--def-create :args args :rtype rtype)))
 
-(defun npdoc--detect-indent ()
+(defun numpydoc--detect-indent ()
   "Detect indentation level of current position's function."
   (let* ((cp (point))
          (beg (progn
@@ -132,46 +133,46 @@ function definition (`python-nav-end-of-statement')."
     (goto-char cp)
     (+ 4 (- ind beg))))
 
-(defun npdoc--insert (fndef indent)
+(defun numpydoc--insert (fndef indent)
   "Insert FNDEF with indentation level INDENT."
   (progn
     (insert "\n")
-    (npdoc--indented-insert indent "\"\"\"SHORT-SUMMARY\n\n")
-    (npdoc--indented-insert indent "LONG-SUMMARY\n")
+    (numpydoc--indented-insert indent "\"\"\"SHORT-SUMMARY\n\n")
+    (numpydoc--indented-insert indent "LONG-SUMMARY\n")
     ;; parameters
-    (when (npdoc--def-args fndef)
+    (when (numpydoc--def-args fndef)
       (insert "\n")
-      (npdoc--indented-insert indent "Parameters\n")
-      (npdoc--indented-insert indent "----------\n")
-      (dolist (element (npdoc--def-args fndef))
-        (let* ((name (npdoc--arg-name element))
-               (type (npdoc--arg-type element)))
-          (npdoc--indented-insert indent
-                                  (if type
-                                      (format "%s : %s\n"
-                                              name type)
-                                    (format "%s\n" name)))
-          (npdoc--indented-insert indent "   ADD\n"))))
+      (numpydoc--indented-insert indent "Parameters\n")
+      (numpydoc--indented-insert indent "----------\n")
+      (dolist (element (numpydoc--def-args fndef))
+        (let* ((name (numpydoc--arg-name element))
+               (type (numpydoc--arg-type element)))
+          (numpydoc--indented-insert indent
+                                     (if type
+                                         (format "%s : %s\n"
+                                                 name type)
+                                       (format "%s\n" name)))
+          (numpydoc--indented-insert indent "   ADD\n"))))
     ;; return
-    (when (npdoc--def-rtype fndef)
+    (when (numpydoc--def-rtype fndef)
       (insert "\n")
-      (npdoc--indented-insert indent "Returns\n")
-      (npdoc--indented-insert indent "-------\n")
-      (npdoc--indented-insert indent (npdoc--def-rtype fndef))
+      (numpydoc--indented-insert indent "Returns\n")
+      (numpydoc--indented-insert indent "-------\n")
+      (numpydoc--indented-insert indent (numpydoc--def-rtype fndef))
       (insert "\n")
-      (npdoc--indented-insert indent "    ADD\n"))
+      (numpydoc--indented-insert indent "    ADD\n"))
     ;; done
     (insert "\n")
-    (npdoc--indented-insert indent "\"\"\"")))
+    (numpydoc--indented-insert indent "\"\"\"")))
 
 ;;;###autoload
-(defun npdoc ()
+(defun numpydoc ()
   "Generate NumPy style docstring for Python function."
   (interactive)
   (let ((cp (point))
-        (indent (npdoc--detect-indent)))
+        (indent (numpydoc--detect-indent)))
     (goto-char cp)
-    (npdoc--insert (npdoc--parse-def) indent)))
+    (numpydoc--insert (numpydoc--parse-def) indent)))
 
-(provide 'npdoc)
-;;; npdoc.el ends here
+(provide 'numpydoc)
+;;; numpydoc.el ends here

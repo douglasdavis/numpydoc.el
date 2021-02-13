@@ -1,4 +1,4 @@
-# npdoc.el
+# numpydoc.el
 
 An Emacs Lisp package to automatically insert NumPy style docstrings
 for Python functions.
@@ -18,7 +18,7 @@ def histogram(
     pass
 ```
 
-After <kbd>M-x npdoc</kbd>:
+After <kbd>M-x numpydoc</kbd>:
 
 ```python
 def histogram(
