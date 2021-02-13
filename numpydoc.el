@@ -5,7 +5,7 @@
 ;; Author: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "26.1") (dash "2.17.0") (s "1.12.0"))
+;; Package-Requires: ((emacs "25.1") (dash "2.17.0") (s "1.12.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,13 +32,11 @@
 (require 'dash)
 (require 's)
 
-(cl-defstruct (numpydoc--def (:constructor numpydoc--def-create)
-                             (:copier nil))
+(cl-defstruct numpydoc--def
   args
   rtype)
 
-(cl-defstruct (numpydoc--arg (:constructor numpydoc--arg-create)
-                             (:copier nil))
+(cl-defstruct numpydoc--arg
   name
   type
   default)
@@ -56,29 +54,29 @@
                 (name (s-trim (car comps1)))
                 (type (s-trim (car comps2)))
                 (default (s-trim (nth 1 comps2))))
-           (numpydoc--arg-create :name name
-                                 :type type
-                                 :default default)))
+           (make-numpydoc--arg :name name
+                               :type type
+                               :default default)))
         ;; only a typehint
         ((s-contains-p ":" s)
          (let* ((comps1 (s-split ":" s))
                 (name (s-trim (car comps1)))
                 (type (s-trim (nth 1 comps1))))
-           (numpydoc--arg-create :name name
-                                 :type type
-                                 :default nil)))
+           (make-numpydoc--arg :name name
+                               :type type
+                               :default nil)))
         ;; only a default value
         ((s-contains-p "=" s)
          (let* ((comps1 (s-split "=" s))
                 (name (s-trim (car comps1)))
                 (default (s-trim (nth 1 comps1))))
-           (numpydoc--arg-create :name name
-                                 :type nil
-                                 :default default)))
+           (make-numpydoc--arg :name name
+                               :type nil
+                               :default default)))
         ;; only a name
-        (t (numpydoc--arg-create :name s
-                                 :type nil
-                                 :default nil))))
+        (t (make-numpydoc--arg :name s
+                               :type nil
+                               :default nil))))
 
 (defun numpydoc--split-args (sig)
   "Split SIG on comma while ignoring commas in type hint brackets."
@@ -129,7 +127,26 @@ function definition (`python-nav-end-of-statement')."
          (args (-remove (lambda (x) (-contains-p '("" "self" "*" "/")
                                             (numpydoc--arg-name x)))
                         (-map (lambda (x) (numpydoc--str-to-arg x)) rawargs))))
-    (numpydoc--def-create :args args :rtype rtype)))
+    (make-numpydoc--def :args args :rtype rtype)))
+
+(defun numpydoc--existing-p ()
+  "Return non-nil if an existing docstring is detected."
+  (let* ((cp (point))
+         (ret nil))
+    (python-nav-beginning-of-defun)
+    (python-nav-end-of-statement)
+    (end-of-line)
+    (right-char)
+    (back-to-indentation)
+    (right-char 1)
+    (setq ret (and (eq ?\" (preceding-char))
+                   (eq ?\" (following-char))
+                   (progn
+                     (right-char)
+                     (eq ?\" (preceding-char)))
+                   t))
+    (goto-char cp)
+    ret))
 
 (defun numpydoc--detect-indent ()
   "Detect indentation level of current position's function."
@@ -141,7 +158,7 @@ function definition (`python-nav-end-of-statement')."
                 (back-to-indentation)
                 (point))))
     (goto-char cp)
-    (+ 4 (- ind beg))))
+    (+ python-indent-offset (- ind beg))))
 
 (defun numpydoc--insert (fndef indent)
   "Insert FNDEF with indentation level INDENT."
@@ -176,13 +193,16 @@ function definition (`python-nav-end-of-statement')."
     (numpydoc--indented-insert indent "\"\"\"")))
 
 ;;;###autoload
-(defun numpydoc ()
+(defun numpydoc-gen ()
   "Generate NumPy style docstring for Python function."
   (interactive)
-  (let ((cp (point))
+  (let ((has-ds (numpydoc--existing-p))
+        (cp (point))
         (indent (numpydoc--detect-indent)))
     (goto-char cp)
-    (numpydoc--insert (numpydoc--parse-def) indent)))
+    (if has-ds
+        (message "Function already has a docstring.")
+      (numpydoc--insert (numpydoc--parse-def) indent))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
