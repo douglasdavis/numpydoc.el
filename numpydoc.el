@@ -5,7 +5,7 @@
 ;; Author: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "25.1") (dash "2.17.0") (s "1.12.0"))
+;; Package-Requires: ((emacs "25.1") (dash "2.17.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -28,9 +28,11 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'subr-x)
 (require 'python)
+
 (require 'dash)
-(require 's)
+
 
 (cl-defstruct numpydoc--def
   args
@@ -47,28 +49,28 @@
 
 (defun numpydoc--str-to-arg (s)
   "Convert S to a `numpydoc--arg' struct instance."
-  (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
-         (let* ((comps1 (s-split ":" s))
-                (comps2 (s-split "=" (nth 1 comps1)))
-                (name (s-trim (car comps1)))
-                (type (s-trim (car comps2)))
-                (defval (s-trim (nth 1 comps2))))
+  (cond ((and (string-match-p ":" s) (string-match-p "=" s))
+         (let* ((comps1 (split-string s ":"))
+                (comps2 (split-string (nth 1 comps1) "="))
+                (name (string-trim (car comps1)))
+                (type (string-trim (car comps2)))
+                (defval (string-trim (nth 1 comps2))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval defval)))
         ;; only a typehint
-        ((s-contains-p ":" s)
-         (let* ((comps1 (s-split ":" s))
-                (name (s-trim (car comps1)))
-                (type (s-trim (nth 1 comps1))))
+        ((string-match-p ":" s)
+         (let* ((comps1 (split-string s ":"))
+                (name (string-trim (car comps1)))
+                (type (string-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval nil)))
         ;; only a default value
-        ((s-contains-p "=" s)
-         (let* ((comps1 (s-split "=" s))
-                (name (s-trim (car comps1)))
-                (defval (s-trim (nth 1 comps1))))
+        ((string-match-p "=" s)
+         (let* ((comps1 (split-string s "="))
+                (name (string-trim (car comps1)))
+                (defval (string-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type nil
                                :defval defval)))
@@ -102,29 +104,33 @@ function definition (`python-nav-end-of-statement')."
          (stop (progn
                  (python-nav-end-of-statement)
                  (point)))
+         (fnsig (buffer-substring-no-properties start stop))
+         ;; trimmed string of the function signature
+         (trimmed (replace-regexp-in-string "[ \t\n\r]+" " " fnsig))
+         ;; split into parts (args and return type)
+         (parts (split-string trimmed "->"))
+         ;; raw return
+         (rawret (if (nth 1 parts)
+                     (string-trim (nth 1 parts))
+                   nil))
+         ;; save return type as a string (or nil)
+         (rtype (when rawret
+                  (substring rawret 0 (1- (length rawret)))))
+         ;; raw signature without return type as a string
+         (rawsig (cond (rtype (substring (string-trim (car parts)) 0 -1))
+                       (t (substring (string-trim (car parts)) 0 -2))))
+         ;; function args as strings
+         (rawargs (mapcar #'string-trim
+                          (numpydoc--split-args
+                           (substring rawsig
+                                      (1+ (string-match-p (regexp-quote "(")
+                                                          rawsig))))))
          ;; args to ignore
          (to-skip '("" "self" "*" ""))
-         ;; trimmed string of the function signature
-         (trimmed (s-collapse-whitespace (buffer-substring-no-properties
-                                          start stop)))
-         ;; split into parts (args and return type)
-         (parts (s-split "->" trimmed))
-         ;; save return type as a string (or nil)
-         (rtype (if (nth 1 parts)
-                    (s-chop-suffix ":" (s-trim (nth 1 parts)))
-                  nil))
-         ;; raw signature without return type as a string
-         (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
-                       (t (substring (s-trim (car parts)) 0 -2))))
-         ;; function args as strings
-         (rawargs (-map #'s-trim
-                        (numpydoc--split-args
-                         (substring rawsig
-                                    (1+ (s-index-of "(" rawsig))))))
          ;; function args as a list of structures (remove some special cases)
-         (args (-remove (lambda (x)
-                          (-contains-p to-skip (numpydoc--arg-name x)))
-                        (-map #'numpydoc--str-to-arg rawargs))))
+         (args (-remove
+                (lambda (x) (-contains-p to-skip (numpydoc--arg-name x)))
+                (mapcar #'numpydoc--str-to-arg rawargs))))
     (make-numpydoc--def :args args :rtype rtype)))
 
 (defun numpydoc--existing-p ()
