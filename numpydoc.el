@@ -98,13 +98,13 @@
 
 This function terminates with the cursor on the end of the python
 function definition (`python-nav-end-of-statement')."
-  (let* ((start (progn
-                  (python-nav-beginning-of-defun)
-                  (point)))
-         (stop (progn
-                 (python-nav-end-of-statement)
-                 (point)))
-         (fnsig (buffer-substring-no-properties start stop))
+  (let* ((fnsig (buffer-substring-no-properties
+                 (progn
+                   (python-nav-beginning-of-defun)
+                   (point))
+                 (progn
+                   (python-nav-end-of-statement)
+                   (point))))
          ;; trimmed string of the function signature
          (trimmed (replace-regexp-in-string "[ \t\n\r]+" " " fnsig))
          ;; split into parts (args and return type)
@@ -125,15 +125,14 @@ function definition (`python-nav-end-of-statement')."
                            (substring rawsig
                                       (1+ (string-match-p (regexp-quote "(")
                                                           rawsig))))))
-         ;; args to ignore
-         (to-skip '("" "self" "*" ""))
          ;; function args as a list of structures (remove some special cases)
-         (args (-remove
-                (lambda (x) (-contains-p to-skip (numpydoc--arg-name x)))
-                (mapcar #'numpydoc--str-to-arg rawargs))))
+         (args (-remove (lambda (x)
+                          (-contains-p (list "" "self" "*" "/")
+                                       (numpydoc--arg-name x)))
+                        (mapcar #'numpydoc--str-to-arg rawargs))))
     (make-numpydoc--def :args args :rtype rtype)))
 
-(defun numpydoc--existing-p ()
+(defun numpydoc--has-existing-docstring-p ()
   "Return non-nil if an existing docstring is detected."
   (let* ((cp (point))
          (ret nil))
@@ -202,16 +201,31 @@ function definition (`python-nav-end-of-statement')."
     (insert "\n")
     (numpydoc--indented-insert indent "\"\"\"")))
 
+(defun numpydoc--existing-docstring-start-end-chars ()
+  "Find the beginning and ending characters of existing docstring."
+  (let ((cp (point))
+        (ds-end (progn
+                  (python-nav-beginning-of-defun)
+                  (python-nav-end-of-statement)
+                  (python-nav-forward-sexp)
+                  (point)))
+        (ds-start (progn
+                    (left-char 4)
+                    (search-backward "\"\"\"")
+                    (point))))
+    (goto-char cp)
+    (vector ds-start ds-end)))
+
 ;;;###autoload
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (interactive)
   (let* ((cp (point))
-         (has-ds (numpydoc--existing-p))
+         (has-ds (numpydoc--has-existing-docstring-p))
          (indent (numpydoc--detect-indent)))
     (goto-char cp)
     (if has-ds
-        (message "Function already has a docstring.")
+        (message "Docstring already exists for this function.")
       (numpydoc--insert (numpydoc--parse-def) indent))))
 
 (provide 'numpydoc)
