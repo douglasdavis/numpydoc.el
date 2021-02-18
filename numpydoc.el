@@ -204,17 +204,17 @@ function definition (`python-nav-end-of-statement')."
 (defun numpydoc--existing-docstring-start-end-chars ()
   "Find the beginning and ending characters of existing docstring."
   (let ((cp (point))
-        (ds-end (progn
-                  (python-nav-beginning-of-defun)
-                  (python-nav-end-of-statement)
-                  (python-nav-forward-sexp)
-                  (point)))
-        (ds-start (progn
-                    (left-char 4)
-                    (search-backward "\"\"\"")
-                    (point))))
+        (end (progn
+               (python-nav-beginning-of-defun)
+               (python-nav-end-of-statement)
+               (python-nav-forward-sexp)
+               (point)))
+        (beg (progn
+               (left-char 4)
+               (search-backward "\"\"\"")
+               (point))))
     (goto-char cp)
-    (vector ds-start ds-end)))
+    (vector beg end)))
 
 ;;;###autoload
 (defun numpydoc-generate ()
