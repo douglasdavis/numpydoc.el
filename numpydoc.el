@@ -182,7 +182,7 @@ function definition (`python-nav-end-of-statement')."
                                          (format "%s : %s\n"
                                                  name type)
                                        (format "%s\n" name)))
-          (numpydoc--indented-insert indent "   ADD\n"))))
+          (numpydoc--indented-insert indent "    ADD\n"))))
     ;; return if non-nil and not "None"
     (when (and (numpydoc--def-rtype fndef)
                (not (string= (numpydoc--def-rtype fndef) "None")))
