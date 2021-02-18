@@ -201,7 +201,7 @@ function definition (`python-nav-end-of-statement')."
     (insert "\n")
     (numpydoc--indented-insert indent "\"\"\"")))
 
-(defun numpydoc--existing-docstring-start-end-chars ()
+(defun numpydoc--existing-docstring-beg-end-chars ()
   "Find the beginning and ending characters of existing docstring."
   (let ((cp (point))
         (end (progn
@@ -214,7 +214,19 @@ function definition (`python-nav-end-of-statement')."
                (search-backward "\"\"\"")
                (point))))
     (goto-char cp)
-    (vector beg end)))
+    (vector (+ 3 beg) (- end 3))))
+
+(defun numpydoc--parse-existing ()
+  "Parse existing docstring."
+  (let* ((cp (point))
+         (id (numpydoc--detect-indent))
+         (be (numpydoc--existing-docstring-beg-end-chars))
+         (ds (buffer-substring-no-properties (elt be 0) (elt be 1)))
+         (parts (-remove #'string-empty-p (split-string ds "\n")))
+         (short-sum (pop parts))
+         (long-sum (substring (pop parts) id)))
+    (goto-char cp)
+    `(,short-sum ,long-sum ,(mapcar (lambda (x) (substring x id)) parts))))
 
 ;;;###autoload
 (defun numpydoc-generate ()
