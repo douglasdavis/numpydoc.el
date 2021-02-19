@@ -203,7 +203,7 @@ function definition (`python-nav-end-of-statement')."
                                             "\n")))
 
 (defun numpydoc--insert-arguments (fnargs indent)
-  "Insert function arguments FNARGS at INDENT level."
+  "Insert FNARGS (function arguments) at INDENT level."
   (when fnargs
     (insert "\n")
     (numpydoc--indented-insert indent "Parameters\n")
@@ -221,6 +221,7 @@ function definition (`python-nav-end-of-statement')."
                                            "\n"))))))
 
 (defun numpydoc--insert-return (fnret indent)
+  "Insert FNRET (the return) description (if return exists) at INDENT level."
   (when (and fnret (not (string= fnret "None")))
     (insert "\n")
     (numpydoc--indented-insert indent "Returns\n")
@@ -233,6 +234,7 @@ function definition (`python-nav-end-of-statement')."
                                        "\n"))))
 
 (defun numpydoc--insert-examples (indent)
+  "Insert function examples block at INDENT level."
   (insert "\n")
   (numpydoc--indented-insert indent "Examples\n")
   (numpydoc--indented-insert indent "--------\n")
