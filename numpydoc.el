@@ -3,9 +3,11 @@
 ;; Copyright (C) 2021  Doug Davis
 
 ;; Author: Doug Davis <ddavis@ddavis.io>
+;; Maintainer: Doug Davis
 ;; URL: https://github.com/douglasdavis/numpydoc.el
+;; License: GPL-3.0-or-later
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "25.1") (dash "2.17.0"))
+;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,7 +34,35 @@
 (require 'python)
 
 (require 'dash)
+(require 's)
 
+;; In Emacs 28 we are able to tag interactive functions to specific
+;; modes; this macro allows us to use the feature and still be
+;; compatible with older versions of GNU Emacs.
+(defmacro future-interactive (arg-descriptor &rest modes)
+  (if (< emacs-major-version 28)
+      `(interactive ,arg-descriptor)
+    `(interactive ,arg-descriptor ,@modes)))
+
+(defgroup numpydoc nil
+  "NumPy docstrings."
+  :group 'convenience
+  :prefix "numpydoc-")
+
+(defcustom numpydoc-short-template "SHORT-DESCRIPTION"
+  "Template text for the short description in a docstring."
+  :type 'string)
+
+(defcustom numpydoc-long-template "LONG-DESCRIPTION"
+  "Template text for the long description in a docstring."
+  :type 'string)
+
+(defcustom numpydoc-desc-template "-ADD-"
+  "Template for individual component descriptions.
+
+This will be added for individual argument and return description
+text, and below the Examples section."
+  :type 'string)
 
 (cl-defstruct numpydoc--def
   args
@@ -43,34 +73,30 @@
   type
   defval)
 
-(defun numpydoc--indented-insert (n s)
-  "Insert S with indentation N."
-  (insert (format "%s%s" (make-string n ?\s) s)))
-
 (defun numpydoc--str-to-arg (s)
   "Convert S to a `numpydoc--arg' struct instance."
-  (cond ((and (string-match-p ":" s) (string-match-p "=" s))
-         (let* ((comps1 (split-string s ":"))
-                (comps2 (split-string (nth 1 comps1) "="))
-                (name (string-trim (car comps1)))
-                (type (string-trim (car comps2)))
-                (defval (string-trim (nth 1 comps2))))
+  (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
+         (let* ((comps1 (s-split ":" s))
+                (comps2 (s-split "=" (nth 1 comps1)))
+                (name (s-trim (car comps1)))
+                (type (s-trim (car comps2)))
+                (defval (s-trim (nth 1 comps2))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval defval)))
         ;; only a typehint
         ((string-match-p ":" s)
-         (let* ((comps1 (split-string s ":"))
-                (name (string-trim (car comps1)))
-                (type (string-trim (nth 1 comps1))))
+         (let* ((comps1 (s-split ":" s))
+                (name (s-trim (car comps1)))
+                (type (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval nil)))
         ;; only a default value
-        ((string-match-p "=" s)
-         (let* ((comps1 (split-string s "="))
-                (name (string-trim (car comps1)))
-                (defval (string-trim (nth 1 comps1))))
+        ((s-contains-p "=" s)
+         (let* ((comps1 (s-split "=" s))
+                (name (s-trim (car comps1)))
+                (defval (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type nil
                                :defval defval)))
@@ -106,36 +132,36 @@ function definition (`python-nav-end-of-statement')."
                    (python-nav-end-of-statement)
                    (point))))
          ;; trimmed string of the function signature
-         (trimmed (replace-regexp-in-string "[ \t\n\r]+" " " fnsig))
+         (trimmed (s-collapse-whitespace fnsig))
          ;; split into parts (args and return type)
-         (parts (split-string trimmed "->"))
+         (parts (s-split "->" trimmed))
          ;; raw return
          (rawret (if (nth 1 parts)
-                     (string-trim (nth 1 parts))
+                     (s-trim (nth 1 parts))
                    nil))
          ;; save return type as a string (or nil)
          (rtype (when rawret
                   (substring rawret 0 (1- (length rawret)))))
          ;; raw signature without return type as a string
-         (rawsig (cond (rtype (substring (string-trim (car parts)) 0 -1))
-                       (t (substring (string-trim (car parts)) 0 -2))))
+         (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
+                       (t (substring (s-trim (car parts)) 0 -2))))
          ;; function args as strings
-         (rawargs (mapcar #'string-trim
-                          (numpydoc--split-args
-                           (substring rawsig
-                                      (1+ (string-match-p (regexp-quote "(")
-                                                          rawsig))))))
+         (rawargs (-map #'s-trim
+                        (numpydoc--split-args
+                         (substring rawsig
+                                    (1+ (string-match-p (regexp-quote "(")
+                                                        rawsig))))))
          ;; function args as a list of structures (remove some special cases)
          (args (-remove (lambda (x)
                           (-contains-p (list "" "self" "*" "/")
                                        (numpydoc--arg-name x)))
-                        (mapcar #'numpydoc--str-to-arg rawargs))))
+                        (-map #'numpydoc--str-to-arg rawargs))))
     (make-numpydoc--def :args args :rtype rtype)))
 
 (defun numpydoc--has-existing-docstring-p ()
   "Return non-nil if an existing docstring is detected."
-  (let* ((cp (point))
-         (ret nil))
+  (let ((cp (point))
+        (ret nil))
     (python-nav-beginning-of-defun)
     (python-nav-end-of-statement)
     (end-of-line)
@@ -153,92 +179,111 @@ function definition (`python-nav-end-of-statement')."
 
 (defun numpydoc--detect-indent ()
   "Detect indentation level of current position's function."
-  (let* ((cp (point))
-         (beg (progn
-                (python-nav-beginning-of-defun)
-                (point)))
-         (ind (progn
-                (back-to-indentation)
-                (point))))
+  (let ((cp (point))
+        (beg (progn
+               (python-nav-beginning-of-defun)
+               (point)))
+        (ind (progn
+               (back-to-indentation)
+               (point))))
     (goto-char cp)
     (+ python-indent-offset (- ind beg))))
 
-(defun numpydoc--insert (fndef indent)
+(defun numpydoc--indented-insert (n s)
+  "Insert S with indentation N."
+  (insert (format "%s%s" (make-string n ?\s) s)))
+
+(defun numpydoc--insert-short-and-long-desc (indent)
+  "Insert short description with INDENT level."
+  (insert "\n")
+  (numpydoc--indented-insert indent (concat (make-string 3 ?\")
+                                            numpydoc-short-template
+                                            "\n\n"))
+  (numpydoc--indented-insert indent (concat numpydoc-long-template
+                                            "\n")))
+
+(defun numpydoc--insert-arguments (fnargs indent)
+  "Insert function arguments FNARGS at INDENT level."
+  (when fnargs
+    (insert "\n")
+    (numpydoc--indented-insert indent "Parameters\n")
+    (numpydoc--indented-insert indent "----------\n")
+    (dolist (element fnargs)
+      (let* ((name (numpydoc--arg-name element))
+             (type (numpydoc--arg-type element)))
+        (numpydoc--indented-insert indent (if type
+                                              (format "%s : %s\n"
+                                                      name type)
+                                            (format "%s\n" name)))
+        (numpydoc--indented-insert indent
+                                   (concat (make-string 4 ?\s)
+                                           numpydoc-desc-template
+                                           "\n"))))))
+
+(defun numpydoc--insert-return (fnret indent)
+  (when (and fnret (not (string= fnret "None")))
+    (insert "\n")
+    (numpydoc--indented-insert indent "Returns\n")
+    (numpydoc--indented-insert indent "-------\n")
+    (numpydoc--indented-insert indent fnret)
+    (insert "\n")
+    (numpydoc--indented-insert indent
+                               (concat (make-string 4 ?\s)
+                                       numpydoc-desc-template
+                                       "\n"))))
+
+(defun numpydoc--insert-examples (indent)
+  (insert "\n")
+  (numpydoc--indented-insert indent "Examples\n")
+  (numpydoc--indented-insert indent "--------\n")
+  (numpydoc--indented-insert indent (concat numpydoc-desc-template "\n\n")))
+
+(defun numpydoc--insert-docstring (fndef indent)
   "Insert FNDEF with indentation level INDENT."
-  (progn
-    (insert "\n")
-    (numpydoc--indented-insert indent "\"\"\"SHORT-SUMMARY\n\n")
-    (numpydoc--indented-insert indent "LONG-SUMMARY\n")
-    ;; parameters
-    (when (numpydoc--def-args fndef)
-      (insert "\n")
-      (numpydoc--indented-insert indent "Parameters\n")
-      (numpydoc--indented-insert indent "----------\n")
-      (dolist (element (numpydoc--def-args fndef))
-        (let* ((name (numpydoc--arg-name element))
-               (type (numpydoc--arg-type element)))
-          (numpydoc--indented-insert indent
-                                     (if type
-                                         (format "%s : %s\n"
-                                                 name type)
-                                       (format "%s\n" name)))
-          (numpydoc--indented-insert indent "    ADD\n"))))
-    ;; return if non-nil and not "None"
-    (when (and (numpydoc--def-rtype fndef)
-               (not (string= (numpydoc--def-rtype fndef) "None")))
-      (insert "\n")
-      (numpydoc--indented-insert indent "Returns\n")
-      (numpydoc--indented-insert indent "-------\n")
-      (numpydoc--indented-insert indent (numpydoc--def-rtype fndef))
-      (insert "\n")
-      (numpydoc--indented-insert indent "    ADD\n"))
-    ;; examples
-    (insert "\n")
-    (numpydoc--indented-insert indent "Examples\n")
-    (numpydoc--indented-insert indent "--------\n")
-    (numpydoc--indented-insert indent "ADD\n")
-    ;; done
-    (insert "\n")
-    (numpydoc--indented-insert indent "\"\"\"")))
+  (numpydoc--insert-short-and-long-desc indent)
+  (numpydoc--insert-arguments (numpydoc--def-args fndef) indent)
+  (numpydoc--insert-return (numpydoc--def-rtype fndef) indent)
+  (numpydoc--insert-examples indent)
+  (numpydoc--indented-insert indent (make-string 3 ?\")))
 
-(defun numpydoc--existing-docstring-beg-end-chars ()
-  "Find the beginning and ending characters of existing docstring."
-  (let ((cp (point))
-        (end (progn
-               (python-nav-beginning-of-defun)
-               (python-nav-end-of-statement)
-               (python-nav-forward-sexp)
-               (point)))
-        (beg (progn
-               (left-char 4)
-               (search-backward "\"\"\"")
-               (point))))
-    (goto-char cp)
-    (vector (+ 3 beg) (- end 3))))
+;; (defun numpydoc--existing-docstring-beg-end-chars ()
+;;   "Find the beginning and ending characters of existing docstring."
+;;   (let ((cp (point))
+;;         (end (progn
+;;                (python-nav-beginning-of-defun)
+;;                (python-nav-end-of-statement)
+;;                (python-nav-forward-sexp)
+;;                (point)))
+;;         (beg (progn
+;;                (left-char 4)
+;;                (search-backward "\"\"\"")
+;;                (point))))
+;;     (goto-char cp)
+;;     (vector (+ 3 beg) (- end 3))))
 
-(defun numpydoc--parse-existing ()
-  "Parse existing docstring."
-  (let* ((cp (point))
-         (id (numpydoc--detect-indent))
-         (be (numpydoc--existing-docstring-beg-end-chars))
-         (ds (buffer-substring-no-properties (elt be 0) (elt be 1)))
-         (parts (-remove #'string-empty-p (split-string ds "\n")))
-         (short-sum (pop parts))
-         (long-sum (substring (pop parts) id)))
-    (goto-char cp)
-    `(,short-sum ,long-sum ,(mapcar (lambda (x) (substring x id)) parts))))
+;; (defun numpydoc--parse-existing ()
+;;   "Parse existing docstring."
+;;   (let* ((cp (point))
+;;          (id (numpydoc--detect-indent))
+;;          (be (numpydoc--existing-docstring-beg-end-chars))
+;;          (ds (buffer-substring-no-properties (elt be 0) (elt be 1)))
+;;          (parts (-remove #'string-empty-p (split-string ds "\n")))
+;;          (short-sum (pop parts))
+;;          (long-sum (substring (pop parts) id)))
+;;     (goto-char cp)
+;;     `(,short-sum ,long-sum ,(mapcar (lambda (x) (substring x id)) parts))))
 
 ;;;###autoload
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
-  (interactive)
+  (future-interactive nil python-mode)
   (let* ((cp (point))
          (has-ds (numpydoc--has-existing-docstring-p))
          (indent (numpydoc--detect-indent)))
     (goto-char cp)
     (if has-ds
         (message "Docstring already exists for this function.")
-      (numpydoc--insert (numpydoc--parse-def) indent))))
+      (numpydoc--insert-docstring (numpydoc--parse-def) indent))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
