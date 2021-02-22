@@ -55,7 +55,6 @@
 
 (defcustom numpydoc-template-desc "ADD"
   "Template for individual component descriptions.
-
 This will be added for individual argument and return description
 text, and below the Examples section."
   :group 'numpydoc
@@ -89,18 +88,13 @@ text, and below the Examples section."
 
 (defun numpydoc--str-to-arg (s)
   "Convert S to an instance of `numpydoc--arg'.
-
 The style of the argument can take on three four:
-
 1. First we check for a typed argument with a default value, so it
    contains both ':' and '='. Example would be 'x: int = 5'.
-
 2. Then we check for a typed argument without a default value,
    containing only ':'. Example would be 'x: int'.
-
 3. Then we check for an untyped argument with a default value,
    containing only '='. Example would be 'x=5'.
-
 4. Finally the default is an untyped argument without a default
    value. Example would be `x`."
   (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
@@ -151,7 +145,6 @@ The style of the argument can take on three four:
 
 (defun numpydoc--parse-def ()
   "Parse a Python function definition; return instance of numpydoc--def.
-
 This function terminates with the cursor on the end of the python
 function definition (`python-nav-end-of-statement')."
   (let* ((fnsig (buffer-substring-no-properties
