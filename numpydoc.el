@@ -36,33 +36,47 @@
 (require 'dash)
 (require 's)
 
-;; In Emacs 28 we are able to tag interactive functions to specific
-;; modes; this macro allows us to use the feature and still be
-;; compatible with older versions of GNU Emacs.
-(defmacro future-interactive (arg-descriptor &rest modes)
-  (if (< emacs-major-version 28)
-      `(interactive ,arg-descriptor)
-    `(interactive ,arg-descriptor ,@modes)))
+;;; customization code.
 
 (defgroup numpydoc nil
   "NumPy docstrings."
   :group 'convenience
   :prefix "numpydoc-")
 
-(defcustom numpydoc-short-template "SHORT-DESCRIPTION"
+(defcustom numpydoc-template-short "SHORT-DESCRIPTION"
   "Template text for the short description in a docstring."
+  :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-long-template "LONG-DESCRIPTION"
+(defcustom numpydoc-template-long "LONG-DESCRIPTION"
   "Template text for the long description in a docstring."
+  :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-desc-template "-ADD-"
+(defcustom numpydoc-template-desc "ADD"
   "Template for individual component descriptions.
 
 This will be added for individual argument and return description
 text, and below the Examples section."
+  :group 'numpydoc
   :type 'string)
+
+(defcustom numpydoc-live-input t
+  "If t, user is prompted for description of each template."
+  :group 'numpydoc
+  :type 'boolean)
+
+(defcustom numpydoc-quote-char ?\"
+  "Character for docstring quoting style (double or single quote)"
+  :group 'numpydoc
+  :type 'character)
+
+(defcustom numpydoc-insert-examples t
+  "Flag to control if Examples section is inserted into the buffer."
+  :group 'numpydoc
+  :type 'boolean)
+
+;; private implementation code.
 
 (cl-defstruct numpydoc--def
   args
@@ -168,11 +182,11 @@ function definition (`python-nav-end-of-statement')."
     (right-char)
     (back-to-indentation)
     (right-char 1)
-    (setq ret (and (eq ?\" (preceding-char))
-                   (eq ?\" (following-char))
+    (setq ret (and (eq numpydoc-quote-char (preceding-char))
+                   (eq numpydoc-quote-char (following-char))
                    (progn
                      (right-char)
-                     (eq ?\" (preceding-char)))
+                     (eq numpydoc-quote-char (preceding-char)))
                    t))
     (goto-char cp)
     ret))
@@ -195,12 +209,25 @@ function definition (`python-nav-end-of-statement')."
 
 (defun numpydoc--insert-short-and-long-desc (indent)
   "Insert short description with INDENT level."
-  (insert "\n")
-  (numpydoc--indented-insert indent (concat (make-string 3 ?\")
-                                            numpydoc-short-template
-                                            "\n\n"))
-  (numpydoc--indented-insert indent (concat numpydoc-long-template
-                                            "\n")))
+  (let ((ld nil))
+    (insert "\n")
+    (numpydoc--indented-insert indent (concat (make-string 3 numpydoc-quote-char)
+                                              (if numpydoc-live-input
+                                                  (read-string
+                                                   (format "Short description: "))
+                                                numpydoc-template-short)
+                                              "\n\n"))
+    (numpydoc--indented-insert indent (make-string 3 numpydoc-quote-char))
+    (forward-line -1)
+    (beginning-of-line)
+    (if numpydoc-live-input
+        (progn
+          (setq ld (read-string "Long description: " nil nil "" nil))
+          (when (length> ld 1)
+            (insert "\n")
+            (numpydoc--indented-insert indent (concat ld "\n"))))
+      (insert "\n")
+      (numpydoc--indented-insert indent (concat numpydoc-template-long "\n")))))
 
 (defun numpydoc--insert-arguments (fnargs indent)
   "Insert FNARGS (function arguments) at INDENT level."
@@ -217,7 +244,12 @@ function definition (`python-nav-end-of-statement')."
                                             (format "%s\n" name)))
         (numpydoc--indented-insert indent
                                    (concat (make-string 4 ?\s)
-                                           numpydoc-desc-template
+                                           (if numpydoc-live-input
+                                               (read-string
+                                                (format
+                                                 "Description for %s: "
+                                                 name))
+                                             numpydoc-template-desc)
                                            "\n"))))))
 
 (defun numpydoc--insert-return (fnret indent)
@@ -230,23 +262,25 @@ function definition (`python-nav-end-of-statement')."
     (insert "\n")
     (numpydoc--indented-insert indent
                                (concat (make-string 4 ?\s)
-                                       numpydoc-desc-template
+                                       (if numpydoc-live-input
+                                           (read-string "Descriptoon for return: ")
+                                         numpydoc-template-desc)
                                        "\n"))))
 
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
-  (insert "\n")
-  (numpydoc--indented-insert indent "Examples\n")
-  (numpydoc--indented-insert indent "--------\n")
-  (numpydoc--indented-insert indent (concat numpydoc-desc-template "\n\n")))
+  (when numpydoc-insert-examples
+    (insert "\n")
+    (numpydoc--indented-insert indent "Examples\n")
+    (numpydoc--indented-insert indent "--------\n")
+    (numpydoc--indented-insert indent (concat numpydoc-template-desc "\n"))))
 
 (defun numpydoc--insert-docstring (fndef indent)
   "Insert FNDEF with indentation level INDENT."
   (numpydoc--insert-short-and-long-desc indent)
   (numpydoc--insert-arguments (numpydoc--def-args fndef) indent)
   (numpydoc--insert-return (numpydoc--def-rtype fndef) indent)
-  (numpydoc--insert-examples indent)
-  (numpydoc--indented-insert indent (make-string 3 ?\")))
+  (numpydoc--insert-examples indent))
 
 ;; (defun numpydoc--existing-docstring-beg-end-chars ()
 ;;   "Find the beginning and ending characters of existing docstring."
@@ -274,6 +308,16 @@ function definition (`python-nav-end-of-statement')."
 ;;          (long-sum (substring (pop parts) id)))
 ;;     (goto-char cp)
 ;;     `(,short-sum ,long-sum ,(mapcar (lambda (x) (substring x id)) parts))))
+
+;; In Emacs 28 we are able to tag interactive functions to specific
+;; modes; this macro allows us to use the feature and still be
+;; compatible with older versions of GNU Emacs.
+(defmacro future-interactive (arg-descriptor &rest modes)
+  (if (< emacs-major-version 28)
+      `(interactive ,arg-descriptor)
+    `(interactive ,arg-descriptor ,@modes)))
+
+;;; public API
 
 ;;;###autoload
 (defun numpydoc-generate ()
