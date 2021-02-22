@@ -61,8 +61,8 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-live-input t
-  "If t, user is prompted for description of each template."
+(defcustom numpydoc-prompt-for-input t
+  "If t you will be prompted to enter a description of each template."
   :group 'numpydoc
   :type 'boolean)
 
@@ -71,7 +71,7 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'character)
 
-(defcustom numpydoc-insert-examples t
+(defcustom numpydoc-insert-examples-block t
   "Flag to control if Examples section is inserted into the buffer."
   :group 'numpydoc
   :type 'boolean)
@@ -88,7 +88,21 @@ text, and below the Examples section."
   defval)
 
 (defun numpydoc--str-to-arg (s)
-  "Convert S to a `numpydoc--arg' struct instance."
+  "Convert S to an instance of `numpydoc--arg'.
+
+The style of the argument can take on three four:
+
+1. First we check for a typed argument with a default value, so it
+   contains both ':' and '='. Example would be 'x: int = 5'.
+
+2. Then we check for a typed argument without a default value,
+   containing only ':'. Example would be 'x: int'.
+
+3. Then we check for an untyped argument with a default value,
+   containing only '='. Example would be 'x=5'.
+
+4. Finally the default is an untyped argument without a default
+   value. Example would be `x`."
   (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
          (let* ((comps1 (s-split ":" s))
                 (comps2 (s-split "=" (nth 1 comps1)))
@@ -129,7 +143,9 @@ text, and below the Examples section."
         (cond ((= ichar ?\[) (setq bc (1+ bc)))
               ((= ichar ?\]) (setq bc (1- bc)))
               ((and (= ichar ?,) (= bc 0))
-               (setq strs (append strs (list (substring all-args (1+ cursor) i))))
+               (setq strs (append strs (list (substring all-args
+                                                        (1+ cursor)
+                                                        i))))
                (setq cursor i)))))
     (setq strs (append strs (list (substring all-args (1+ cursor)))))))
 
@@ -203,7 +219,7 @@ function definition (`python-nav-end-of-statement')."
     (goto-char cp)
     (+ python-indent-offset (- ind beg))))
 
-(defun numpydoc--indented-insert (n s)
+(defun numpydoc--insert (n s)
   "Insert S with indentation N."
   (insert (format "%s%s" (make-string n ?\s) s)))
 
@@ -211,69 +227,69 @@ function definition (`python-nav-end-of-statement')."
   "Insert short description with INDENT level."
   (let ((ld nil))
     (insert "\n")
-    (numpydoc--indented-insert indent (concat (make-string 3 numpydoc-quote-char)
-                                              (if numpydoc-live-input
-                                                  (read-string
-                                                   (format "Short description: "))
-                                                numpydoc-template-short)
-                                              "\n\n"))
-    (numpydoc--indented-insert indent (make-string 3 numpydoc-quote-char))
+    (numpydoc--insert indent (concat (make-string 3 numpydoc-quote-char)
+                                     (if numpydoc-prompt-for-input
+                                         (read-string
+                                          (format "Short description: "))
+                                       numpydoc-template-short)
+                                     "\n\n"))
+    (numpydoc--insert indent (make-string 3 numpydoc-quote-char))
     (forward-line -1)
     (beginning-of-line)
-    (if numpydoc-live-input
+    (if numpydoc-prompt-for-input
         (progn
           (setq ld (read-string "Long description: " nil nil "" nil))
           (when (length> ld 1)
             (insert "\n")
-            (numpydoc--indented-insert indent (concat ld "\n"))))
+            (numpydoc--insert indent (concat ld "\n"))))
       (insert "\n")
-      (numpydoc--indented-insert indent (concat numpydoc-template-long "\n")))))
+      (numpydoc--insert indent (concat numpydoc-template-long "\n")))))
 
 (defun numpydoc--insert-arguments (fnargs indent)
   "Insert FNARGS (function arguments) at INDENT level."
   (when fnargs
     (insert "\n")
-    (numpydoc--indented-insert indent "Parameters\n")
-    (numpydoc--indented-insert indent "----------\n")
+    (numpydoc--insert indent "Parameters\n")
+    (numpydoc--insert indent "----------\n")
     (dolist (element fnargs)
       (let* ((name (numpydoc--arg-name element))
              (type (numpydoc--arg-type element)))
-        (numpydoc--indented-insert indent (if type
-                                              (format "%s : %s\n"
-                                                      name type)
-                                            (format "%s\n" name)))
-        (numpydoc--indented-insert indent
-                                   (concat (make-string 4 ?\s)
-                                           (if numpydoc-live-input
-                                               (read-string
-                                                (format
-                                                 "Description for %s: "
-                                                 name))
-                                             numpydoc-template-desc)
-                                           "\n"))))))
+        (numpydoc--insert indent (if type
+                                     (format "%s : %s\n"
+                                             name type)
+                                   (format "%s\n" name)))
+        (numpydoc--insert indent
+                          (concat (make-string 4 ?\s)
+                                  (if numpydoc-prompt-for-input
+                                      (read-string
+                                       (format
+                                        "Description for %s: "
+                                        name))
+                                    numpydoc-template-desc)
+                                  "\n"))))))
 
 (defun numpydoc--insert-return (fnret indent)
-  "Insert FNRET (the return) description (if return exists) at INDENT level."
+  "Insert FNRET (return) description (if exists) at INDENT level."
   (when (and fnret (not (string= fnret "None")))
     (insert "\n")
-    (numpydoc--indented-insert indent "Returns\n")
-    (numpydoc--indented-insert indent "-------\n")
-    (numpydoc--indented-insert indent fnret)
+    (numpydoc--insert indent "Returns\n")
+    (numpydoc--insert indent "-------\n")
+    (numpydoc--insert indent fnret)
     (insert "\n")
-    (numpydoc--indented-insert indent
-                               (concat (make-string 4 ?\s)
-                                       (if numpydoc-live-input
-                                           (read-string "Descriptoon for return: ")
-                                         numpydoc-template-desc)
-                                       "\n"))))
+    (numpydoc--insert indent
+                      (concat (make-string 4 ?\s)
+                              (if numpydoc-prompt-for-input
+                                  (read-string "Description for return: ")
+                                numpydoc-template-desc)
+                              "\n"))))
 
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
-  (when numpydoc-insert-examples
+  (when numpydoc-insert-examples-block
     (insert "\n")
-    (numpydoc--indented-insert indent "Examples\n")
-    (numpydoc--indented-insert indent "--------\n")
-    (numpydoc--indented-insert indent (concat numpydoc-template-desc "\n"))))
+    (numpydoc--insert indent "Examples\n")
+    (numpydoc--insert indent "--------\n")
+    (numpydoc--insert indent (concat numpydoc-template-desc "\n"))))
 
 (defun numpydoc--insert-docstring (fndef indent)
   "Insert FNDEF with indentation level INDENT."
