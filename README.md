@@ -43,7 +43,7 @@ inserted into the docstring.
   <dd>
   If true an Examples block will be added to the
   docstring (default is t).
-</dd>
+  </dd>
 </dl>
 
 ## Example
