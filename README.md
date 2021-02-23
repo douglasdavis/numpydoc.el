@@ -11,13 +11,14 @@ inserted into the docstring.
 
 ## Customization
 
+See inside Emacs with <kbd>M-x customize-group <RET> numpydoc</kbd>;
+
 <dl>
   <dt>numpydoc-prompt-for-input</dt>
   <dd>
   If true you will be prompted to enter a short description and long
   description, a description for each function argument, and a
-  description of the return if a return type hint is provided (default
-  is t).
+  description of the return if a return type hint is provided.
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
@@ -26,23 +27,22 @@ inserted into the docstring.
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
-  If true an Examples block will be added to the
-  docstring (default is t).
+  If true an Examples block will be added to the docstring.
   </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
-  numpydoc-prompt-for-input is nil (default is SHORT-DESCRIPTION).
+  numpydoc-prompt-for-input is nil.
   </dd>
   <dt>numpydoc-template-long</dt>
   <dd>
   Template text that will be used as the long description if
-  numpydoc-prompt-for-input is nil (default is LONG-DESCRIPTION).
+  numpydoc-prompt-for-input is nil.
   </dd>
   <dt>numpydoc-template-desc</dt>
   <dd>
   Template text that will be used for each function argument
-  description if numpydoc-prompt-for-input is nil. (default is ADD)
+  description if numpydoc-prompt-for-input is nil.
   </dd>
 </dl>
 
