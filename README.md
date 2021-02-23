@@ -1,7 +1,33 @@
 # numpydoc.el
 
 An Emacs Lisp package to automatically insert NumPy style docstrings
-for Python functions.
+for Python functions. The `numpydoc-generate` function parses the
+function signature and detects argument names, argument type hints,
+and return type hints. The default behavior is to prompt the user (in
+the minibuffer) for a (short and long) description of the function,
+and a description for each argument and the returned value. If the
+prompt is turned off some (customizable) template text will be
+inserted into the docstring.
+
+## Customization
+
+- `numpydoc-prompt-for-input` (default `t`): If true you will be
+  prompted to enter a short description and long description, a
+  description for each function argument, and a description of the
+  return (if a return type hint is provided).
+- `numpydoc-template-short` (default `"SHORT-DESCRIPTION"`): Template
+  text that will be used as the short description if
+  `numpydoc-prompt-for-input` is `nil`.
+- `numpydoc-template-long` (default `"LONG-DESCRIPTION"`): Template
+  text that will be used as the long description if
+  `numpydoc-prompt-for-input` is `nil`.
+- `numpydoc-template-desc` (default `"ADD"`): Template text that will
+  be used for each function argument description if
+  `numpydoc-prompt-for-input` is `nil`.
+- `numpydoc-quote-char` (default `?\"`): Python quote character to use
+  (prefers double quite, the default from the black formatting tool).
+- `numpydoc-insert-examples-block` (default `t`): If true an
+  `Examples` block will be added to the docstring.
 
 ## Example
 

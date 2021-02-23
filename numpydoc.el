@@ -43,6 +43,11 @@
   :group 'convenience
   :prefix "numpydoc-")
 
+(defcustom numpydoc-prompt-for-input t
+  "If t you will be prompted to enter a description of each template."
+  :group 'numpydoc
+  :type 'boolean)
+
 (defcustom numpydoc-template-short "SHORT-DESCRIPTION"
   "Template text for the short description in a docstring."
   :group 'numpydoc
@@ -59,11 +64,6 @@ This will be added for individual argument and return description
 text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
-
-(defcustom numpydoc-prompt-for-input t
-  "If t you will be prompted to enter a description of each template."
-  :group 'numpydoc
-  :type 'boolean)
 
 (defcustom numpydoc-quote-char ?\"
   "Character for docstring quoting style (double or single quote)"
