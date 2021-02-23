@@ -88,7 +88,7 @@ text, and below the Examples section."
 
 (defun numpydoc--str-to-arg (s)
   "Convert S to an instance of `numpydoc--arg'.
-The style of the argument can take on three four:
+The argument takes on one of four possible styles:
 1. First we check for a typed argument with a default value, so it
    contains both ':' and '='. Example would be 'x: int = 5'.
 2. Then we check for a typed argument without a default value,
@@ -97,7 +97,8 @@ The style of the argument can take on three four:
    containing only '='. Example would be 'x=5'.
 4. Finally the default is an untyped argument without a default
    value. Example would be `x`."
-  (cond ((and (s-contains-p ":" s) (s-contains-p "=" s))
+  (cond (;; type hint and default value
+         (and (s-contains-p ":" s) (s-contains-p "=" s))
          (let* ((comps1 (s-split ":" s))
                 (comps2 (s-split "=" (nth 1 comps1)))
                 (name (s-trim (car comps1)))
@@ -242,8 +243,8 @@ function definition (`python-nav-end-of-statement')."
     (numpydoc--insert indent "Parameters\n")
     (numpydoc--insert indent "----------\n")
     (dolist (element fnargs)
-      (let* ((name (numpydoc--arg-name element))
-             (type (numpydoc--arg-type element)))
+      (let ((name (numpydoc--arg-name element))
+            (type (numpydoc--arg-type element)))
         (numpydoc--insert indent (if type
                                      (format "%s : %s\n"
                                              name type)
