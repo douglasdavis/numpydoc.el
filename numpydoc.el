@@ -147,70 +147,67 @@ The style of the argument can take on three four:
   "Parse a Python function definition; return instance of numpydoc--def.
 This function terminates with the cursor on the end of the python
 function definition (`python-nav-end-of-statement')."
-  (let* ((fnsig (buffer-substring-no-properties
-                 (progn
-                   (python-nav-beginning-of-defun)
-                   (point))
-                 (progn
-                   (python-nav-end-of-statement)
-                   (point))))
-         ;; trimmed string of the function signature
-         (trimmed (s-collapse-whitespace fnsig))
-         ;; split into parts (args and return type)
-         (parts (s-split "->" trimmed))
-         ;; raw return
-         (rawret (if (nth 1 parts)
-                     (s-trim (nth 1 parts))
-                   nil))
-         ;; save return type as a string (or nil)
-         (rtype (when rawret
-                  (substring rawret 0 (1- (length rawret)))))
-         ;; raw signature without return type as a string
-         (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
-                       (t (substring (s-trim (car parts)) 0 -2))))
-         ;; function args as strings
-         (rawargs (-map #'s-trim
-                        (numpydoc--split-args
-                         (substring rawsig
-                                    (1+ (string-match-p (regexp-quote "(")
-                                                        rawsig))))))
-         ;; function args as a list of structures (remove some special cases)
-         (args (-remove (lambda (x)
-                          (-contains-p (list "" "self" "*" "/")
-                                       (numpydoc--arg-name x)))
-                        (-map #'numpydoc--str-to-arg rawargs))))
-    (make-numpydoc--def :args args :rtype rtype)))
+  (save-excursion
+    (let* ((fnsig (buffer-substring-no-properties
+                   (progn
+                     (python-nav-beginning-of-defun)
+                     (point))
+                   (progn
+                     (python-nav-end-of-statement)
+                     (point))))
+           ;; trimmed string of the function signature
+           (trimmed (s-collapse-whitespace fnsig))
+           ;; split into parts (args and return type)
+           (parts (s-split "->" trimmed))
+           ;; raw return
+           (rawret (if (nth 1 parts)
+                       (s-trim (nth 1 parts))
+                     nil))
+           ;; save return type as a string (or nil)
+           (rtype (when rawret
+                    (substring rawret 0 (1- (length rawret)))))
+           ;; raw signature without return type as a string
+           (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
+                         (t (substring (s-trim (car parts)) 0 -2))))
+           ;; function args as strings
+           (rawargs (-map #'s-trim
+                          (numpydoc--split-args
+                           (substring rawsig
+                                      (1+ (string-match-p (regexp-quote "(")
+                                                          rawsig))))))
+           ;; function args as a list of structures (remove some special cases)
+           (args (-remove (lambda (x)
+                            (-contains-p (list "" "self" "*" "/")
+                                         (numpydoc--arg-name x)))
+                          (-map #'numpydoc--str-to-arg rawargs))))
+      (make-numpydoc--def :args args :rtype rtype))))
 
 (defun numpydoc--has-existing-docstring-p ()
-  "Return non-nil if an existing docstring is detected."
-  (let ((cp (point))
-        (ret nil))
+  "Check if an existing docstring is detected."
+  (save-excursion
     (python-nav-beginning-of-defun)
     (python-nav-end-of-statement)
     (end-of-line)
     (right-char)
     (back-to-indentation)
     (right-char 1)
-    (setq ret (and (eq numpydoc-quote-char (preceding-char))
-                   (eq numpydoc-quote-char (following-char))
-                   (progn
-                     (right-char)
-                     (eq numpydoc-quote-char (preceding-char)))
-                   t))
-    (goto-char cp)
-    ret))
+    (and (eq numpydoc-quote-char (preceding-char))
+         (eq numpydoc-quote-char (following-char))
+         (progn
+           (right-char)
+           (eq numpydoc-quote-char (preceding-char)))
+         t)))
 
 (defun numpydoc--detect-indent ()
-  "Detect indentation level of current position's function."
-  (let ((cp (point))
-        (beg (progn
-               (python-nav-beginning-of-defun)
-               (point)))
-        (ind (progn
-               (back-to-indentation)
-               (point))))
-    (goto-char cp)
-    (+ python-indent-offset (- ind beg))))
+  "Detect necessary indent for current function's docstring."
+  (save-excursion
+    (let ((beg (progn
+                 (python-nav-beginning-of-defun)
+                 (point)))
+          (ind (progn
+                 (back-to-indentation)
+                 (point))))
+      (+ python-indent-offset (- ind beg)))))
 
 (defun numpydoc--insert (n s)
   "Insert S with indentation N."
@@ -332,13 +329,12 @@ function definition (`python-nav-end-of-statement')."
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (future-interactive nil python-mode)
-  (let* ((cp (point))
-         (has-ds (numpydoc--has-existing-docstring-p))
-         (indent (numpydoc--detect-indent)))
-    (goto-char cp)
-    (if has-ds
-        (message "Docstring already exists for this function.")
-      (numpydoc--insert-docstring (numpydoc--parse-def) indent))))
+  (if (numpydoc--has-existing-docstring-p)
+      (message "Docstring already exists for this function.")
+    (python-nav-beginning-of-defun)
+    (python-nav-end-of-statement)
+    (let ((fndef (numpydoc--parse-def)))
+      (numpydoc--insert-docstring fndef (numpydoc--detect-indent)))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
