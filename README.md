@@ -11,34 +11,40 @@ inserted into the docstring.
 
 ## Customization
 
-numpydoc-prompt-for-input
-    If true you will be prompted to enter a short description and
-    long description, a description for each function argument, and
-    a description of the return if a return type hint is provided
-    (default is `t`).
-
-numpydoc-template-short
-    : Template text that will be used as the short description if
-      `numpydoc-prompt-for-input` is `nil` (default is
-      SHORT-DESCRIPTION).
-
-numpydoc-template-long
-    : Template text that will be used as the long description if
-      `numpydoc-prompt-for-input` is `nil` (default is
-      LONG-DESCRIPTION).
-
-numpydoc-template-desc
-    : (default `"ADD"`): Template text that will be used for each
-      function argument description if `numpydoc-prompt-for-input` is
-      `nil`.
-
-numpydoc-quote-char
-    : (default `?\"`): Python quote character to use (prefers double
-      quite, the default from the black formatting tool).
-
-numpydoc-insert-examples-block
-    : (default `t`): If true an `Examples` block will be added to the
-      docstring.
+<dl>
+  <dt>numpydoc-prompt-for-input</dt>
+  <dd>
+  If true you will be prompted to enter a short description and long
+  description, a description for each function argument, and a
+  description of the return if a return type hint is provided (default
+  is `t`).
+  </dd>
+  <dt>numpydoc-template-short</dt>
+  <dd>
+  Template text that will be used as the short description if
+  `numpydoc-prompt-for-input` is `nil` (default is SHORT-DESCRIPTION).
+  </dd>
+  <dt>numpydoc-template-long</dt>
+  <dd>
+  Template text that will be used as the long description if
+  `numpydoc-prompt-for-input` is `nil` (default is LONG-DESCRIPTION).
+  </dd>
+  <dt>numpydoc-template-desc</dt>
+  <dd>
+  (default `"ADD"`): Template text that will be used for each function
+  argument description if `numpydoc-prompt-for-input` is `nil`.
+  </dd>
+  <dt>numpydoc-quote-char</dt>
+  <dd>
+  (default `?\"`): Python quote character to use (prefers double
+  quite, the default from the black formatting tool).
+  </dd>
+  <dt>numpydoc-insert-examples-block</dt>
+  <dd>
+  (default `t`): If true an `Examples` block will be added to the
+  docstring.
+  </dd>
+</dl>
 
 ## Example
 
