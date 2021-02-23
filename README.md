@@ -11,23 +11,34 @@ inserted into the docstring.
 
 ## Customization
 
-- `numpydoc-prompt-for-input` (default `t`): If true you will be
-  prompted to enter a short description and long description, a
-  description for each function argument, and a description of the
-  return (if a return type hint is provided).
-- `numpydoc-template-short` (default `"SHORT-DESCRIPTION"`): Template
-  text that will be used as the short description if
-  `numpydoc-prompt-for-input` is `nil`.
-- `numpydoc-template-long` (default `"LONG-DESCRIPTION"`): Template
-  text that will be used as the long description if
-  `numpydoc-prompt-for-input` is `nil`.
-- `numpydoc-template-desc` (default `"ADD"`): Template text that will
-  be used for each function argument description if
-  `numpydoc-prompt-for-input` is `nil`.
-- `numpydoc-quote-char` (default `?\"`): Python quote character to use
-  (prefers double quite, the default from the black formatting tool).
-- `numpydoc-insert-examples-block` (default `t`): If true an
-  `Examples` block will be added to the docstring.
+numpydoc-prompt-for-input
+    : If true you will be prompted to enter a short description and
+      long description, a description for each function argument, and
+      a description of the return if a return type hint is provided
+      (default is `t`).
+
+numpydoc-template-short
+    : Template text that will be used as the short description if
+      `numpydoc-prompt-for-input` is `nil` (default is
+      SHORT-DESCRIPTION).
+
+numpydoc-template-long
+    : Template text that will be used as the long description if
+      `numpydoc-prompt-for-input` is `nil` (default is
+      LONG-DESCRIPTION).
+
+numpydoc-template-desc
+    : (default `"ADD"`): Template text that will be used for each
+      function argument description if `numpydoc-prompt-for-input` is
+      `nil`.
+
+numpydoc-quote-char
+    : (default `?\"`): Python quote character to use (prefers double
+      quite, the default from the black formatting tool).
+
+numpydoc-insert-examples-block
+    : (default `t`): If true an `Examples` block will be added to the
+      docstring.
 
 ## Example
 
