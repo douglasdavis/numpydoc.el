@@ -19,6 +19,16 @@ inserted into the docstring.
   description of the return if a return type hint is provided (default
   is t).
   </dd>
+  <dt>numpydoc-quote-char</dt>
+  <dd>
+  Python quote character to use (default is double quote, the default
+  from the black formatting tool).
+  </dd>
+  <dt>numpydoc-insert-examples-block</dt>
+  <dd>
+  If true an Examples block will be added to the
+  docstring (default is t).
+  </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
@@ -33,16 +43,6 @@ inserted into the docstring.
   <dd>
   Template text that will be used for each function argument
   description if numpydoc-prompt-for-input is nil. (default is ADD)
-  </dd>
-  <dt>numpydoc-quote-char</dt>
-  <dd>
-  Python quote character to use (default is double quote, the default
-  from the black formatting tool).
-  </dd>
-  <dt>numpydoc-insert-examples-block</dt>
-  <dd>
-  If true an Examples block will be added to the
-  docstring (default is t).
   </dd>
 </dl>
 
@@ -61,7 +61,8 @@ def histogram(
     pass
 ```
 
-After <kbd>M-x numpydoc-generate</kbd>:
+After <kbd>M-x numpydoc-generate</kbd> (with
+`numpydoc-prompt-for-input` set to `nil`):
 
 ```python
 def histogram(
