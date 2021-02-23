@@ -11,7 +11,7 @@ inserted into the docstring.
 
 ## Customization
 
-See inside Emacs with <kbd>M-x customize-group <RET> numpydoc</kbd>;
+See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
 
 <dl>
   <dt>numpydoc-prompt-for-input</dt>
