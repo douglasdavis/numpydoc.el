@@ -17,33 +17,33 @@ inserted into the docstring.
   If true you will be prompted to enter a short description and long
   description, a description for each function argument, and a
   description of the return if a return type hint is provided (default
-  is `t`).
+  is t).
   </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
-  `numpydoc-prompt-for-input` is `nil` (default is SHORT-DESCRIPTION).
+  numpydoc-prompt-for-input is nil (default is SHORT-DESCRIPTION).
   </dd>
   <dt>numpydoc-template-long</dt>
   <dd>
   Template text that will be used as the long description if
-  `numpydoc-prompt-for-input` is `nil` (default is LONG-DESCRIPTION).
+  numpydoc-prompt-for-input is nil (default is LONG-DESCRIPTION).
   </dd>
   <dt>numpydoc-template-desc</dt>
   <dd>
-  (default `"ADD"`): Template text that will be used for each function
-  argument description if `numpydoc-prompt-for-input` is `nil`.
+  Template text that will be used for each function argument
+  description if numpydoc-prompt-for-input is nil. (default is ADD)
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
-  (default `?\"`): Python quote character to use (prefers double
-  quite, the default from the black formatting tool).
+  Python quote character to use (default is double quote, the default
+  from the black formatting tool).
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
-  (default `t`): If true an `Examples` block will be added to the
-  docstring.
-  </dd>
+  If true an Examples block will be added to the
+  docstring (default is t).
+</dd>
 </dl>
 
 ## Example
