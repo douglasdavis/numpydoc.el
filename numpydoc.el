@@ -1,13 +1,13 @@
-;;; numpydoc.el --- Insert NumPy style docstring     -*- lexical-binding: t; -*-
+;;; numpydoc.el --- NumPy style docstring insertion -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  Doug Davis
 
 ;; Author: Doug Davis <ddavis@ddavis.io>
-;; Maintainer: Doug Davis
+;; Maintainer: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; License: GPL-3.0-or-later
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((python "0.26") (s "1.12.0") (dash "2.18.0"))
+;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,17 +27,18 @@
 
 ;; This package provides a single public function to automatically
 ;; generate NumPy style docstrings for Python functions:
-;; `numpydoc-generate'.
+;; `numpydoc-generate'. The NumPy docstring style guide can be found
+;; at https://numpydoc.readthedocs.io/en/latest/format.html
 ;;
 ;; Customizations include opting in or out of a minibuffer prompt for
 ;; entering various components of the docstring, templates for when
 ;; opting out of the prompt, the quoting style used, and whether or
-;; not to include an Examples block.
+;; not to include an Examples block. See the `numpydoc' customization
+;; group.
 
 ;;; Code:
 
 (require 'cl-lib)
-(require 'subr-x)
 (require 'python)
 
 (require 'dash)
@@ -73,7 +74,7 @@ text, and below the Examples section."
   :type 'string)
 
 (defcustom numpydoc-quote-char ?\"
-  "Character for docstring quoting style (double or single quote)"
+  "Character for docstring quoting style (double or single quote)."
   :group 'numpydoc
   :type 'character)
 
@@ -135,21 +136,21 @@ The argument takes on one of four possible styles:
                                :type nil
                                :defval nil))))
 
-(defun numpydoc--split-args (all-args)
-  "Split ALL-ARGS on comma delimiter but ignore commas in type brackets."
+(defun numpydoc--split-args (fnargs)
+  "Split FNARGS on comma but ignore those in type [brackets]."
   (let ((bc 0)
         (cursor -1)
         (strs '()))
-    (dotimes (i (length all-args))
-      (let ((ichar (aref all-args i)))
+    (dotimes (i (length fnargs))
+      (let ((ichar (aref fnargs i)))
         (cond ((= ichar ?\[) (setq bc (1+ bc)))
               ((= ichar ?\]) (setq bc (1- bc)))
               ((and (= ichar ?,) (= bc 0))
-               (setq strs (append strs (list (substring all-args
+               (setq strs (append strs (list (substring fnargs
                                                         (1+ cursor)
                                                         i))))
                (setq cursor i)))))
-    (setq strs (append strs (list (substring all-args (1+ cursor)))))))
+    (setq strs (append strs (list (substring fnargs (1+ cursor)))))))
 
 (defun numpydoc--parse-def ()
   "Parse a Python function definition; return instance of numpydoc--def.
@@ -207,7 +208,7 @@ function definition (`python-nav-end-of-statement')."
          t)))
 
 (defun numpydoc--detect-indent ()
-  "Detect necessary indent for current function's docstring."
+  "Detect necessary indent for current function docstring."
   (save-excursion
     (let ((beg (progn
                  (python-nav-beginning-of-defun)
@@ -223,6 +224,7 @@ function definition (`python-nav-end-of-statement')."
     (insert (format "%s%s" (make-string indent ?\s) s))))
 
 (defun numpydoc--fill-last-insertion ()
+  "Fill paragraph on last inserted text."
   (save-excursion
     (move-beginning-of-line nil)
     (back-to-indentation)
@@ -322,10 +324,14 @@ function definition (`python-nav-end-of-statement')."
   (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
   (numpydoc--insert-examples indent))
 
-;; In GNU Emacs 28 we are able to tag interactive functions to
-;; specific modes; this macro allows us to use the feature and still
-;; be compatible with older versions of GNU Emacs.
-(defmacro future-interactive (arg-descriptor &rest modes)
+(defmacro numpydoc--interactive (arg-descriptor &rest modes)
+  "Use interactive tagging only when possible.
+In GNU Emacs 28 we are able to tag interactive functions to
+specific modes; this macro allows us to use the feature and still
+be compatible with older versions of GNU Emacs. ARG-DESCRIPTOR is
+passed to `interactive' like expected in versions pre-28, while
+MODES is the list of modes where the function is interactive in
+28-and-later versions."
   (if (< emacs-major-version 28)
       `(interactive ,arg-descriptor)
     `(interactive ,arg-descriptor ,@modes)))
@@ -335,7 +341,7 @@ function definition (`python-nav-end-of-statement')."
 ;;;###autoload
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
-  (future-interactive nil python-mode)
+  (numpydoc--interactive nil python-mode)
   (if (numpydoc--has-existing-docstring-p)
       (message "Docstring already exists for this function.")
     (python-nav-beginning-of-defun)
