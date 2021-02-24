@@ -48,9 +48,19 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
   </dd>
 </dl>
 
-## Example
+## Examples
 
-An example function:
+<kbd>M-x numpydoc-generate</kbd> with the default configuration
+(prompt in minibuffer):
+
+<p align="center">
+<img src="doc/example.gif"/>
+</p>
+
+Or, <kbd>M-x numpydoc-generate</kbd> with
+`numpydoc-prompt-for-input` set to `nil`:
+
+Before:
 
 ```python
 def plot_histogram(
@@ -64,15 +74,7 @@ def plot_histogram(
     pass
 ```
 
-<kbd>M-x numpydoc-generate</kbd> with the default configuration
-(prompt in minibuffer):
-
-<p align="center">
-<img src="doc/example.gif"/>
-</p>
-
-Or, after <kbd>M-x numpydoc-generate</kbd> with
-`numpydoc-prompt-for-input` set to `nil`:
+After:
 
 ```python
 def plot_histogram(
