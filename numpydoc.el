@@ -325,6 +325,21 @@ function definition (`python-nav-end-of-statement')."
   (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
   (numpydoc--insert-examples indent))
 
+(defun numpydoc--delete-existing ()
+  "Delete existing docstring."
+  (let ((3q (make-string 3 numpydoc-quote-char)))
+    (python-nav-beginning-of-defun)
+    (python-nav-end-of-statement)
+    (re-search-forward 3q)
+    (left-char 3)
+    (set-mark-command nil)
+    (re-search-forward 3q)
+    (re-search-forward 3q)
+    (right-char 1)
+    (delete-region (region-beginning) (region-end))
+    (indent-for-tab-command)
+    (deactivate-mark)))
+
 (defmacro numpydoc--interactive (arg-descriptor &rest modes)
   "Use interactive tagging only when possible.
 In GNU Emacs 28 we are able to tag interactive functions to
@@ -343,12 +358,17 @@ MODES is the list of modes where the function is interactive in
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (numpydoc--interactive nil python-mode)
-  (if (numpydoc--has-existing-docstring-p)
-      (message "Docstring already exists for this function.")
-    (python-nav-beginning-of-defun)
-    (python-nav-end-of-statement)
-    (numpydoc--insert-docstring (numpydoc--detect-indent)
-                                (numpydoc--parse-def))))
+  (let ((good-to-go t))
+    (when (numpydoc--has-existing-docstring-p)
+      (if (y-or-n-p "Docstring exists; destroy and start new? ")
+          (numpydoc--kill-existing)
+        (setq good-to-go nil)))
+    (when good-to-go
+      (deactivate-mark)
+      (python-nav-beginning-of-defun)
+      (python-nav-end-of-statement)
+      (numpydoc--insert-docstring (numpydoc--detect-indent)
+                                  (numpydoc--parse-def)))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
