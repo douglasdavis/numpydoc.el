@@ -48,17 +48,17 @@
   :group 'numpydoc
   :type 'boolean)
 
-(defcustom numpydoc-template-short "SHORT-DESCRIPTION"
+(defcustom numpydoc-template-short "FIXME: Short description."
   "Template text for the short description in a docstring."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-template-long "LONG-DESCRIPTION"
+(defcustom numpydoc-template-long "FIXME: Long description."
   "Template text for the long description in a docstring."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-template-desc "ADD"
+(defcustom numpydoc-template-desc "FIXME: Add docs."
   "Template for individual component descriptions.
 This will be added for individual argument and return description
 text, and below the Examples section."
@@ -86,7 +86,7 @@ text, and below the Examples section."
   type
   defval)
 
-(defun numpydoc--str-to-arg (s)
+(defun numpydoc--arg-str-to-struct (s)
   "Convert S to an instance of `numpydoc--arg'.
 The argument takes on one of four possible styles:
 1. First we check for a typed argument with a default value, so it
@@ -180,7 +180,7 @@ function definition (`python-nav-end-of-statement')."
            (args (-remove (lambda (x)
                             (-contains-p (list "" "self" "*" "/")
                                          (numpydoc--arg-name x)))
-                          (-map #'numpydoc--str-to-arg rawargs))))
+                          (-map #'numpydoc--arg-str-to-struct rawargs))))
       (make-numpydoc--def :args args :rtype rtype))))
 
 (defun numpydoc--has-existing-docstring-p ()
@@ -210,10 +210,19 @@ function definition (`python-nav-end-of-statement')."
                  (point))))
       (+ python-indent-offset (- ind beg)))))
 
-(defun numpydoc--insert (n &rest lines)
-  "Insert all elements of LINES at indent level N."
+(defun numpydoc--insert (indent &rest lines)
+  "Insert all elements of LINES at indent level INDENT."
   (dolist (s lines)
-    (insert (format "%s%s" (make-string n ?\s) s))))
+    (insert (format "%s%s" (make-string indent ?\s) s))))
+
+(defun numpydoc--fill-last-insertion ()
+  (save-excursion
+    (move-beginning-of-line nil)
+    (back-to-indentation)
+    (set-mark-command nil)
+    (move-end-of-line nil)
+    (fill-paragraph nil t)
+    (deactivate-mark)))
 
 (defun numpydoc--insert-short-and-long-desc (indent)
   "Insert short description with INDENT level."
@@ -232,37 +241,48 @@ function definition (`python-nav-end-of-statement')."
     (if numpydoc-prompt-for-input
         (progn
           (setq ld (read-string "Long description: " nil nil "" nil))
-          (when (length> ld 1)
+          (when (length> ld 0)
             (insert "\n")
-            (numpydoc--insert indent (concat ld "\n"))))
+            (numpydoc--insert indent ld)
+            (numpydoc--fill-last-insertion)
+            (insert "\n")))
       (insert "\n")
-      (numpydoc--insert indent (concat numpydoc-template-long "\n")))))
+      (numpydoc--insert indent numpydoc-template-long)
+      (insert "\n"))))
 
-(defun numpydoc--insert-arguments (fnargs indent)
+(defun numpydoc--insert-parameter (indent element)
+  "Insert ELEMENT parameter name and type at level INDENT."
+  (let ((name (numpydoc--arg-name element))
+        (type (numpydoc--arg-type element)))
+    (numpydoc--insert indent
+                      (if type
+                          (format "%s : %s\n" name type)
+                        (format "%s\n" name)))))
+
+(defun numpydoc--insert-parameter-desc (indent element)
+  "Insert ELEMENT parameter description at level INDENT."
+  (let* ((name (numpydoc--arg-name element))
+         (desc (concat (make-string 4 ?\s)
+                       (if numpydoc-prompt-for-input
+                           (read-string (format "Description for %s: "
+                                                name))
+                         numpydoc-template-desc))))
+    (numpydoc--insert indent desc)
+    (numpydoc--fill-last-insertion)
+    (insert "\n")))
+
+(defun numpydoc--insert-parameters (indent fnargs)
   "Insert FNARGS (function arguments) at INDENT level."
   (when fnargs
     (insert "\n")
     (numpydoc--insert indent
-                        "Parameters\n"
-                        "----------\n")
+                      "Parameters\n"
+                      "----------\n")
     (dolist (element fnargs)
-      (let ((name (numpydoc--arg-name element))
-            (type (numpydoc--arg-type element)))
-        (numpydoc--insert indent (if type
-                                     (format "%s : %s\n"
-                                             name type)
-                                   (format "%s\n" name)))
-        (numpydoc--insert indent
-                          (concat (make-string 4 ?\s)
-                                  (if numpydoc-prompt-for-input
-                                      (read-string
-                                       (format
-                                        "Description for %s: "
-                                        name))
-                                    numpydoc-template-desc)
-                                  "\n"))))))
+      (numpydoc--insert-parameter indent element)
+      (numpydoc--insert-parameter-desc indent element))))
 
-(defun numpydoc--insert-return (fnret indent)
+(defun numpydoc--insert-return (indent fnret)
   "Insert FNRET (return) description (if exists) at INDENT level."
   (when (and fnret (not (string= fnret "None")))
     (insert "\n")
@@ -287,39 +307,12 @@ function definition (`python-nav-end-of-statement')."
                       "--------\n"
                       (concat numpydoc-template-desc "\n"))))
 
-(defun numpydoc--insert-docstring (fndef indent)
+(defun numpydoc--insert-docstring (indent fndef)
   "Insert FNDEF with indentation level INDENT."
   (numpydoc--insert-short-and-long-desc indent)
-  (numpydoc--insert-arguments (numpydoc--def-args fndef) indent)
-  (numpydoc--insert-return (numpydoc--def-rtype fndef) indent)
+  (numpydoc--insert-parameters indent (numpydoc--def-args fndef))
+  (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
   (numpydoc--insert-examples indent))
-
-;; (defun numpydoc--existing-docstring-beg-end-chars ()
-;;   "Find the beginning and ending characters of existing docstring."
-;;   (let ((cp (point))
-;;         (end (progn
-;;                (python-nav-beginning-of-defun)
-;;                (python-nav-end-of-statement)
-;;                (python-nav-forward-sexp)
-;;                (point)))
-;;         (beg (progn
-;;                (left-char 4)
-;;                (search-backward "\"\"\"")
-;;                (point))))
-;;     (goto-char cp)
-;;     (vector (+ 3 beg) (- end 3))))
-
-;; (defun numpydoc--parse-existing ()
-;;   "Parse existing docstring."
-;;   (let* ((cp (point))
-;;          (id (numpydoc--detect-indent))
-;;          (be (numpydoc--existing-docstring-beg-end-chars))
-;;          (ds (buffer-substring-no-properties (elt be 0) (elt be 1)))
-;;          (parts (-remove #'string-empty-p (split-string ds "\n")))
-;;          (short-sum (pop parts))
-;;          (long-sum (substring (pop parts) id)))
-;;     (goto-char cp)
-;;     `(,short-sum ,long-sum ,(mapcar (lambda (x) (substring x id)) parts))))
 
 ;; In Emacs 28 we are able to tag interactive functions to specific
 ;; modes; this macro allows us to use the feature and still be
@@ -340,7 +333,7 @@ function definition (`python-nav-end-of-statement')."
     (python-nav-beginning-of-defun)
     (python-nav-end-of-statement)
     (let ((fndef (numpydoc--parse-def)))
-      (numpydoc--insert-docstring fndef (numpydoc--detect-indent)))))
+      (numpydoc--insert-docstring (numpydoc--detect-indent) fndef))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here

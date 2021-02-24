@@ -72,31 +72,31 @@ def histogram(
     weights: Optional[np.ndarray] = None,
     flow: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """SHORT-SUMMARY
+    """FIXME: Short description.
 
-    LONG-SUMMARY
+    FIXME: Long description.
 
     Parameters
     ----------
     x : np.ndarray
-       ADD
+        FIXME: Add docs.
     bins : int
-       ADD
+        FIXME: Add docs.
     range : Optional[Tuple[float, float]]
-       ADD
+        FIXME: Add docs.
     weights : Optional[np.ndarray]
-       ADD
+        FIXME: Add docs.
     flow : bool
-       ADD
+        FIXME: Add docs.
 
     Returns
     -------
     Tuple[np.ndarray, np.ndarray]
-        ADD
+        FIXME: Add docs.
 
     Examples
     --------
-    ADD
+    FIXME: Add docs.
 
     """
     pass
