@@ -57,7 +57,7 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
 paragraph-filled:
 
 <p align="center">
-<img src="doc/example.gif"/>
+<img src="doc/example.gif" style="border-radius:10px"/>
 </p>
 
 Or, <kbd>M-x numpydoc-generate</kbd> with
