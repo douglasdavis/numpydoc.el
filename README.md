@@ -1,7 +1,8 @@
 # numpydoc.el
 
-An Emacs Lisp package to automatically insert NumPy style docstrings
-for Python functions.
+An Emacs Lisp package to automatically insert [NumPy style
+docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) for
+Python functions.
 
 Calling `numpydoc-generate` will parse the function signature (for the
 function corresponding to the current cursor location) and detects
@@ -24,8 +25,9 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
-  Quote character to use (default is double quote, which is inspired
-  by black formatting tool).
+  Quote character to use (the default is a double quote, used
+  throughout the numpydoc docstring guide and the black formatting
+  tool).
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
