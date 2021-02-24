@@ -1,2 +1,7 @@
 *.elc
+numpydoc-autoloads.el
 .DS_Store
+
+# Added automatically by ‘eldev init’.
+/.eldev
+/Eldev-local
