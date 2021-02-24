@@ -51,7 +51,8 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
 ## Examples
 
 <kbd>M-x numpydoc-generate</kbd> with the default configuration
-(prompt in minibuffer):
+(prompt in minibuffer) notice how long text is automatically
+paragraph-filled:
 
 <p align="center">
 <img src="doc/example.gif"/>
