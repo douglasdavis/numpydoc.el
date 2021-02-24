@@ -120,8 +120,8 @@ def plot_histogram(
     pass
 ```
 
-## Similar packages:
+## Similar packages
 
-- [https://github.com/naiquevin/sphinx-doc.el](sphinx-doc.el): Inserts
+- [sphinx-doc.el](https://github.com/naiquevin/sphinx-doc.el): Inserts
   sphinx-compatible docstrings (does not offer customizations or
   automatically formatted insertions from minibuffer prompt).
