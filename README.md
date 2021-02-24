@@ -67,7 +67,9 @@ def plot_histogram(
 <kbd>M-x numpydoc-generate</kbd> with the default configuration
 (prompt in minibuffer):
 
-![Demo](doc/example.gif)
+<p align="center">
+<img src="doc/example.gif"/>
+</p>
 
 Or, after <kbd>M-x numpydoc-generate</kbd> with
 `numpydoc-prompt-for-input` set to `nil`:

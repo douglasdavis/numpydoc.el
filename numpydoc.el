@@ -322,9 +322,9 @@ function definition (`python-nav-end-of-statement')."
   (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
   (numpydoc--insert-examples indent))
 
-;; In Emacs 28 we are able to tag interactive functions to specific
-;; modes; this macro allows us to use the feature and still be
-;; compatible with older versions of GNU Emacs.
+;; In GNU Emacs 28 we are able to tag interactive functions to
+;; specific modes; this macro allows us to use the feature and still
+;; be compatible with older versions of GNU Emacs.
 (defmacro future-interactive (arg-descriptor &rest modes)
   (if (< emacs-major-version 28)
       `(interactive ,arg-descriptor)
