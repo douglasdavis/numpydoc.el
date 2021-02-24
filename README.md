@@ -18,12 +18,12 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
   <dd>
   If true you will be prompted to enter a short description and long
   description, a description for each function argument, and a
-  description of the return if a return type hint is provided.
+  description for the return (if a return type hint is provided).
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
-  Python quote character to use (default is double quote, the default
-  from the black formatting tool).
+  Quote character to use (default is double quote, which is inspired
+  by black formatting tool).
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>

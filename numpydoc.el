@@ -7,7 +7,7 @@
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; License: GPL-3.0-or-later
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
+;; Package-Requires: ((python "0.26") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,14 @@
 
 ;;; Commentary:
 
-;; Insert NumPy style docstrings into Python function definitions.
+;; This package provides a single public function to automatically
+;; generate NumPy style docstrings for Python functions:
+;; `numpydoc-generate'.
+;;
+;; Customizations include opting in or out of a minibuffer prompt for
+;; entering various components of the docstring, templates for when
+;; opting out of the prompt, the quoting style used, and whether or
+;; not to include an Examples block.
 
 ;;; Code:
 
@@ -44,7 +51,7 @@
   :prefix "numpydoc-")
 
 (defcustom numpydoc-prompt-for-input t
-  "If t you will be prompted to enter a description of each template."
+  "If t you will be prompted to enter necessary descriptions."
   :group 'numpydoc
   :type 'boolean)
 
@@ -59,7 +66,7 @@
   :type 'string)
 
 (defcustom numpydoc-template-desc "FIXME: Add docs."
-  "Template for individual component descriptions.
+  "Template text for individual component descriptions.
 This will be added for individual argument and return description
 text, and below the Examples section."
   :group 'numpydoc
@@ -295,8 +302,9 @@ function definition (`python-nav-end-of-statement')."
                       (concat (make-string 4 ?\s)
                               (if numpydoc-prompt-for-input
                                   (read-string "Description for return: ")
-                                numpydoc-template-desc)
-                              "\n"))))
+                                numpydoc-template-desc)))
+    (numpydoc--fill-last-insertion)
+    (insert "\n")))
 
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
@@ -332,8 +340,8 @@ function definition (`python-nav-end-of-statement')."
       (message "Docstring already exists for this function.")
     (python-nav-beginning-of-defun)
     (python-nav-end-of-statement)
-    (let ((fndef (numpydoc--parse-def)))
-      (numpydoc--insert-docstring (numpydoc--detect-indent) fndef))))
+    (numpydoc--insert-docstring (numpydoc--detect-indent)
+                                (numpydoc--parse-def))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
