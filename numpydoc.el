@@ -40,6 +40,7 @@
 
 (require 'cl-lib)
 (require 'python)
+(require 'subr-x)
 
 (require 'dash)
 (require 's)
@@ -250,7 +251,7 @@ function definition (`python-nav-end-of-statement')."
     (if numpydoc-prompt-for-input
         (progn
           (setq ld (read-string "Long description: " nil nil "" nil))
-          (when (length> ld 0)
+          (when (not (string-empty-p ld))
             (insert "\n")
             (numpydoc--insert indent ld)
             (numpydoc--fill-last-insertion)
