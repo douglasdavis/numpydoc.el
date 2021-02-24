@@ -95,8 +95,8 @@ text, and below the Examples section."
   type
   defval)
 
-(defun numpydoc--arg-str-to-struct (s)
-  "Convert S to an instance of `numpydoc--arg'.
+(defun numpydoc--arg-str-to-struct (argstr)
+  "Convert ARGSTR to an instance of `numpydoc--arg'.
 The argument takes on one of four possible styles:
 1. First we check for a typed argument with a default value, so it
    contains both ':' and '='. Example would be 'x: int = 5'.
@@ -107,8 +107,8 @@ The argument takes on one of four possible styles:
 4. Finally the default is an untyped argument without a default
    value. Example would be `x`."
   (cond (;; type hint and default value
-         (and (s-contains-p ":" s) (s-contains-p "=" s))
-         (let* ((comps1 (s-split ":" s))
+         (and (s-contains-p ":" argstr) (s-contains-p "=" argstr))
+         (let* ((comps1 (s-split ":" argstr))
                 (comps2 (s-split "=" (nth 1 comps1)))
                 (name (s-trim (car comps1)))
                 (type (s-trim (car comps2)))
@@ -117,23 +117,23 @@ The argument takes on one of four possible styles:
                                :type type
                                :defval defval)))
         ;; only a typehint
-        ((string-match-p ":" s)
-         (let* ((comps1 (s-split ":" s))
+        ((string-match-p ":" argstr)
+         (let* ((comps1 (s-split ":" argstr))
                 (name (s-trim (car comps1)))
                 (type (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval nil)))
         ;; only a default value
-        ((s-contains-p "=" s)
-         (let* ((comps1 (s-split "=" s))
+        ((s-contains-p "=" argstr)
+         (let* ((comps1 (s-split "=" argstr))
                 (name (s-trim (car comps1)))
                 (defval (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
                                :type nil
                                :defval defval)))
         ;; only a name
-        (t (make-numpydoc--arg :name s
+        (t (make-numpydoc--arg :name argstr
                                :type nil
                                :defval nil))))
 
