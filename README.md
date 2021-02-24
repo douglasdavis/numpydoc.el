@@ -1,13 +1,15 @@
 # numpydoc.el
 
 An Emacs Lisp package to automatically insert NumPy style docstrings
-for Python functions. The `numpydoc-generate` function parses the
-function signature and detects argument names, argument type hints,
-and return type hints. The default behavior is to prompt the user (in
-the minibuffer) for a (short and long) description of the function,
-and a description for each argument and the returned value. If the
-prompt is turned off some (customizable) template text will be
-inserted into the docstring.
+for Python functions.
+
+Calling `numpydoc-generate` will parse the function signature (for the
+function corresponding to the current cursor location) and detects
+argument names, argument type hints, and return type hints. The
+default behavior is to prompt the user (in the minibuffer) for a
+(short and long) description of the function, and a description for
+each argument and the returned value. If the prompt is turned off some
+(customizable) template text will be inserted into the docstring.
 
 ## Customization
 
@@ -51,27 +53,34 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>.
 An example function:
 
 ```python
-def histogram(
+def plot_histogram(
     x: np.ndarray,
     bins: int = 10,
     range: Optional[Tuple[float, float]] = None,
     weights: Optional[np.ndarray] = None,
     flow: bool = False,
-) -> Tuple[np.ndarray, np.ndarray]:
+    ax: Optional[plt.Axes] = None,
+) -> Tuple[plt.Figure, plt.Axes]:
     pass
 ```
 
-After <kbd>M-x numpydoc-generate</kbd> (with
-`numpydoc-prompt-for-input` set to `nil`):
+<kbd>M-x numpydoc-generate</kbd> with the default configuration
+(prompt in minibuffer):
+
+![Demo](doc/example.gif)
+
+Or, after <kbd>M-x numpydoc-generate</kbd> with
+`numpydoc-prompt-for-input` set to `nil`:
 
 ```python
-def histogram(
+def plot_histogram(
     x: np.ndarray,
     bins: int = 10,
     range: Optional[Tuple[float, float]] = None,
     weights: Optional[np.ndarray] = None,
     flow: bool = False,
-) -> Tuple[np.ndarray, np.ndarray]:
+    ax: Optional[plt.Axes] = None,
+) -> Tuple[plt.Figure, plt.Axes]:
     """FIXME: Short description.
 
     FIXME: Long description.
@@ -88,10 +97,12 @@ def histogram(
         FIXME: Add docs.
     flow : bool
         FIXME: Add docs.
+    ax : plt.Axes
+        FIXME: Add docs.
 
     Returns
     -------
-    Tuple[np.ndarray, np.ndarray]
+    Tuple[plt.Figure, plt.Axes]
         FIXME: Add docs.
 
     Examples
