@@ -48,7 +48,7 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dt>numpydoc-template-desc</dt>
   <dd>
   Template text that will be used for each function argument
-  description if <code>numpydoc-prompt-for-input<code> is
+  description if <code>numpydoc-prompt-for-input</code> is
   <code>nil</code>.
   </dd>
 </dl>
