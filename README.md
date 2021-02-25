@@ -21,15 +21,15 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
 <dl>
   <dt>numpydoc-prompt-for-input</dt>
   <dd>
-  If `t` you will be prompted to enter a short description and long
-  description, a description for each function argument, and a
-  description for the return (if a return type hint is provided).
+  If <code>t</code> you will be prompted to enter a short description
+  and long description, a description for each function argument, and
+  a description for the return (if a return type hint is provided).
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
-  Quote character to use (the default is a double quote, `?\"`, used
-  throughout the numpydoc docstring guide and the black formatting
-  tool).
+  Quote character to use (the default is a double quote,
+  <code>?\"</code>, used throughout the numpydoc docstring guide and
+  the black formatting tool).
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
@@ -38,17 +38,18 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
-  `numpydoc-prompt-for-input` is `nil`.
+  <code>numpydoc-prompt-for-input</code> is <code>nil</code>.
   </dd>
   <dt>numpydoc-template-long</dt>
   <dd>
   Template text that will be used as the long description if
-  `numpydoc-prompt-for-input` is `nil`.
+  <code>numpydoc-prompt-for-input</code> is <code>nil</code>.
   </dd>
   <dt>numpydoc-template-desc</dt>
   <dd>
   Template text that will be used for each function argument
-  description if `numpydoc-prompt-for-input` is `nil`.
+  description if <code>numpydoc-prompt-for-input<code> is
+  <code>nil</code>.
   </dd>
 </dl>
 
