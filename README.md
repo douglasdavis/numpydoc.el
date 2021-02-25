@@ -33,7 +33,7 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   </dd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
-  If `t` an Examples block will be added to the docstring.
+  If <code>t</code> an Examples block will be added to the docstring.
   </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
