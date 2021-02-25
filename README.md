@@ -10,9 +10,10 @@ argument names, argument type hints, and return type hints. The
 default behavior is to prompt the user (in the minibuffer) for a
 (short and long) description of the function, and a description for
 each argument and the returned value. If the prompt is off
-(`numpydoc-prompt-for-input` is nil), then some customizable template
-text will be inserted into the docstring. If an existing docstring is
-detected, you'll be asked if you'd like to delete it and start fresh.
+(`numpydoc-prompt-for-input` is `nil`), then some customizable
+template text will be inserted into the docstring. If an existing
+docstring is detected, you'll be asked if you'd like to delete it and
+start fresh.
 
 ## Customization
 
