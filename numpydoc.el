@@ -154,9 +154,7 @@ The argument takes on one of four possible styles:
     (setq strs (append strs (list (substring fnargs (1+ cursor)))))))
 
 (defun numpydoc--parse-def ()
-  "Parse a Python function definition; return instance of numpydoc--def.
-This function terminates with the cursor on the end of the python
-function definition (`python-nav-end-of-statement')."
+  "Parse a Python function definition; return instance of numpydoc--def."
   (save-excursion
     (let* ((fnsig (buffer-substring-no-properties
                    (progn
