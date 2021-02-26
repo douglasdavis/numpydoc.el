@@ -89,6 +89,9 @@ def plot_histogram(
     flow: bool = False,
     ax: Optional[plt.Axes] = None,
 ) -> Tuple[plt.Figure, plt.Axes]:
+    if weights is not None:
+        if weights.shape != np.shape:
+            raise ValueError("x and weights must have same shape.")
     pass
 ```
 
@@ -119,7 +122,7 @@ def plot_histogram(
         FIXME: Add docs.
     flow : bool
         FIXME: Add docs.
-    ax : plt.Axes
+    ax : Optional[plt.Axes]
         FIXME: Add docs.
 
     Returns
@@ -127,11 +130,19 @@ def plot_histogram(
     Tuple[plt.Figure, plt.Axes]
         FIXME: Add docs.
 
+    Raises
+    ------
+    ValueError
+        FIXME: Add docs.
+
     Examples
     --------
     FIXME: Add docs.
 
     """
+    if weights is not None:
+        if weights.shape != np.shape:
+            raise ValueError("x and weights must have same shape.")
     pass
 ```
 
