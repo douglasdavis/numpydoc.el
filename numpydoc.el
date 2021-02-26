@@ -84,11 +84,19 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'boolean)
 
+(defcustom numpydoc-insert-raises-block t
+  "Flag to control if the Raises section is inserted.
+This section will only be inserted if the flag is on and the function
+body has raise statements."
+  :group 'numpydoc
+  :type 'boolean)
+
 ;; private implementation code.
 
 (cl-defstruct numpydoc--def
   args
-  rtype)
+  rtype
+  raises)
 
 (cl-defstruct numpydoc--arg
   name
@@ -194,8 +202,10 @@ This function expects the cursor to be in the function body."
            (args (-remove (lambda (x)
                             (-contains-p (list "" "self" "*" "/")
                                          (numpydoc--arg-name x)))
-                          (-map #'numpydoc--arg-str-to-struct rawargs))))
-      (make-numpydoc--def :args args :rtype rtype))))
+                          (-map #'numpydoc--arg-str-to-struct rawargs)))
+           ;; look for exceptions in the function body
+           (exceptions (numpydoc--find-exceptions)))
+      (make-numpydoc--def :args args :rtype rtype :raises exceptions))))
 
 (defun numpydoc--has-existing-docstring-p ()
   "Check if an existing docstring is detected."
@@ -224,10 +234,44 @@ This function expects the cursor to be in the function body."
                  (point))))
       (+ python-indent-offset (- ind beg)))))
 
-(defun numpydoc--insert (indent &rest lines)
-  "Insert all elements of LINES at indent level INDENT."
-  (dolist (s lines)
-    (insert (format "%s%s" (make-string indent ?\s) s))))
+(defun numpydoc--fnsig-range ()
+  "Find the beginning and end of the function signature."
+  (save-excursion
+    (vector (progn (python-nav-beginning-of-defun) (point))
+            (progn (python-nav-end-of-statement) (point)))))
+
+(defun numpydoc--function-range ()
+  "Find the beginning and end of the function definition."
+  (save-excursion
+    (vector (progn (python-nav-beginning-of-defun) (point))
+            (progn (python-nav-end-of-defun) (point)))))
+
+(defun numpydoc--find-exceptions ()
+  "Find exceptions in the function body (depends on cursor position)."
+  (save-excursion
+    (let ((lines '())
+          (fnrange (numpydoc--function-range))
+          (pat (rx (one-or-more blank)
+                   "raise"
+                   (= 1 blank)
+                   (any upper-case)
+                   anything)))
+      (goto-char (elt fnrange 0))
+      (while (re-search-forward pat (elt fnrange 1) t)
+        (save-excursion
+          (let ((p1 (progn
+                      (move-beginning-of-line nil)
+                      (back-to-indentation)
+                      (point)))
+                (p2 (progn
+                      (move-end-of-line nil)
+                      (point))))
+            (push (buffer-substring-no-properties p1 p2) lines))))
+      (-uniq
+       (-map (lambda (x)
+               (car (s-split (rx (or eol "("))
+                             (s-chop-prefix "raise " x))))
+             lines)))))
 
 (defun numpydoc--fill-last-insertion ()
   "Fill paragraph on last inserted text."
@@ -238,6 +282,11 @@ This function expects the cursor to be in the function body."
     (move-end-of-line nil)
     (fill-paragraph nil t)
     (deactivate-mark)))
+
+(defun numpydoc--insert (indent &rest lines)
+  "Insert all elements of LINES at indent level INDENT."
+  (dolist (s lines)
+    (insert (format "%s%s" (make-string indent ?\s) s))))
 
 (defun numpydoc--insert-short-and-long-desc (indent)
   "Insert short description with INDENT level."
@@ -265,23 +314,20 @@ This function expects the cursor to be in the function body."
       (numpydoc--insert indent numpydoc-template-long)
       (insert "\n"))))
 
-(defun numpydoc--insert-parameter (indent element)
-  "Insert ELEMENT parameter name and type at level INDENT."
-  (let ((name (numpydoc--arg-name element))
-        (type (numpydoc--arg-type element)))
-    (numpydoc--insert indent
-                      (if type
-                          (format "%s : %s\n" name type)
-                        (format "%s\n" name)))))
+(defun numpydoc--insert-parameter (indent name &optional type)
+  "Insert parameter with NAME and TYPE at level INDENT."
+  (numpydoc--insert indent
+                    (if type
+                        (format "%s : %s\n" name type)
+                      (format "%s\n" name))))
 
 (defun numpydoc--insert-parameter-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
-  (let* ((name (numpydoc--arg-name element))
-         (desc (concat (make-string 4 ?\s)
-                       (if numpydoc-prompt-for-input
-                           (read-string (format "Description for %s: "
-                                                name))
-                         numpydoc-template-desc))))
+  (let ((desc (concat (make-string 4 ?\s)
+                      (if numpydoc-prompt-for-input
+                          (read-string (format "Description for %s: "
+                                               element))
+                        numpydoc-template-desc))))
     (numpydoc--insert indent desc)
     (numpydoc--fill-last-insertion)
     (insert "\n")))
@@ -294,8 +340,11 @@ This function expects the cursor to be in the function body."
                       "Parameters\n"
                       "----------\n")
     (dolist (element fnargs)
-      (numpydoc--insert-parameter indent element)
-      (numpydoc--insert-parameter-desc indent element))))
+      (numpydoc--insert-parameter indent
+                                  (numpydoc--arg-name element)
+                                  (numpydoc--arg-type element))
+      (numpydoc--insert-parameter-desc indent
+                                       (numpydoc--arg-name element)))))
 
 (defun numpydoc--insert-return (indent fnret)
   "Insert FNRET (return) description (if exists) at INDENT level."
@@ -314,6 +363,17 @@ This function expects the cursor to be in the function body."
     (numpydoc--fill-last-insertion)
     (insert "\n")))
 
+(defun numpydoc--insert-exceptions (indent fnexcepts)
+  "Insert FNEXCEPTS (exception) elements at INDENT level."
+  (when (and numpydoc-insert-raises-block fnexcepts)
+    (insert "\n")
+    (numpydoc--insert indent
+                      "Raises\n"
+                      "------\n")
+    (dolist (exceptstr fnexcepts)
+      (numpydoc--insert-parameter indent exceptstr)
+      (numpydoc--insert-parameter-desc indent exceptstr))))
+
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
   (when numpydoc-insert-examples-block
@@ -328,6 +388,7 @@ This function expects the cursor to be in the function body."
   (numpydoc--insert-short-and-long-desc indent)
   (numpydoc--insert-parameters indent (numpydoc--def-args fndef))
   (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
+  (numpydoc--insert-exceptions indent (numpydoc--def-raises fndef))
   (numpydoc--insert-examples indent))
 
 (defun numpydoc--delete-existing ()
