@@ -14,6 +14,7 @@ tasks:
     cd numpydoc.el
     eldev -p -dtT compile
     eldev -p -dtT test
+triggers:
 - action: email
   condition: failure
   to: "<ddavis@ddavis.io>"
