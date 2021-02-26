@@ -153,16 +153,23 @@ The argument takes on one of four possible styles:
                (setq cursor i)))))
     (setq strs (append strs (list (substring fnargs (1+ cursor)))))))
 
-(defun numpydoc--parse-def ()
-  "Parse a Python function definition; return instance of numpydoc--def."
+
+(defun numpydoc--extract-def ()
+  "Extract function definition string from the buffer.
+This function expects the cursor to be in the function body."
   (save-excursion
-    (let* ((fnsig (buffer-substring-no-properties
-                   (progn
-                     (python-nav-beginning-of-defun)
-                     (point))
-                   (progn
-                     (python-nav-end-of-statement)
-                     (point))))
+    (buffer-substring-no-properties
+     (progn
+       (python-nav-beginning-of-defun)
+       (point))
+     (progn
+       (python-nav-end-of-statement)
+       (point)))))
+
+(defun numpydoc--parse-def (buffer-substr)
+  "Parse the BUFFER-SUBSTR; return instance of numpydoc--def."
+  (save-excursion
+    (let* ((fnsig buffer-substr)
            ;; trimmed string of the function signature
            (trimmed (s-collapse-whitespace fnsig))
            ;; split into parts (args and return type)
@@ -357,7 +364,8 @@ MODES is the list of modes where the function is interactive in
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (numpydoc--interactive nil python-mode)
-  (let ((good-to-go t))
+  (let ((good-to-go t)
+        (fnsig (numpydoc--extract-def)))
     (when (numpydoc--has-existing-docstring-p)
       (if (y-or-n-p "Docstring exists; destroy and start new? ")
           (numpydoc--delete-existing)
@@ -366,7 +374,7 @@ MODES is the list of modes where the function is interactive in
       (python-nav-beginning-of-defun)
       (python-nav-end-of-statement)
       (numpydoc--insert-docstring (numpydoc--detect-indent)
-                                  (numpydoc--parse-def)))))
+                                  (numpydoc--parse-def fnsig)))))
 
 (provide 'numpydoc)
 ;;; numpydoc.el ends here

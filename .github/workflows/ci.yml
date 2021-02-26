@@ -4,6 +4,9 @@ on:
   push:
     paths-ignore:
     - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
@@ -19,10 +22,17 @@ jobs:
           - snapshot
 
     steps:
-    - uses: purcell/setup-emacs@master
+    - name: Setup GNU Emacs
+      uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
 
-    - uses: actions/checkout@v2
-    - name: Byte compile
-      run: make
+    - name: Install Eldev
+      run: curl -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev | sh
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Test
+      run: |
+        eldev -p -dtT test
