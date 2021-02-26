@@ -1,5 +1,7 @@
 # numpydoc.el
 
+[![CI](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml/badge.svg)](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml)
+
 An Emacs Lisp package to automatically insert [NumPy style
 docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) for
 Python functions.
