@@ -35,4 +35,5 @@ jobs:
 
     - name: Test
       run: |
+        eldev -p -dtT compile
         eldev -p -dtT test
