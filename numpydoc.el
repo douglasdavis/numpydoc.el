@@ -346,24 +346,12 @@ This function expects the cursor to be in the function body."
       (deactivate-mark)
       (indent-for-tab-command))))
 
-(defmacro numpydoc--interactive (arg-descriptor &rest modes)
-  "Use interactive tagging only when possible.
-In GNU Emacs 28 we are able to tag interactive functions to
-specific modes; this macro allows us to use the feature and still
-be compatible with older versions of GNU Emacs. ARG-DESCRIPTOR is
-passed to `interactive' like expected in versions pre-28, while
-MODES is the list of modes where the function is interactive in
-28-and-later versions."
-  (if (< emacs-major-version 28)
-      `(interactive ,arg-descriptor)
-    `(interactive ,arg-descriptor ,@modes)))
-
 ;;; public API
 
 ;;;###autoload
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
-  (numpydoc--interactive nil python-mode)
+  (interactive)
   (let ((good-to-go t)
         (fnsig (numpydoc--extract-def)))
     (when (numpydoc--has-existing-docstring-p)
