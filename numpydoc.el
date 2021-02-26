@@ -314,14 +314,14 @@ This function expects the cursor to be in the function body."
       (numpydoc--insert indent numpydoc-template-long)
       (insert "\n"))))
 
-(defun numpydoc--insert-parameter (indent name &optional type)
+(defun numpydoc--insert-item (indent name &optional type)
   "Insert parameter with NAME and TYPE at level INDENT."
   (numpydoc--insert indent
                     (if type
                         (format "%s : %s\n" name type)
                       (format "%s\n" name))))
 
-(defun numpydoc--insert-parameter-desc (indent element)
+(defun numpydoc--insert-item-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
   (let ((desc (concat (make-string 4 ?\s)
                       (if numpydoc-prompt-for-input
@@ -340,11 +340,11 @@ This function expects the cursor to be in the function body."
                       "Parameters\n"
                       "----------\n")
     (dolist (element fnargs)
-      (numpydoc--insert-parameter indent
-                                  (numpydoc--arg-name element)
-                                  (numpydoc--arg-type element))
-      (numpydoc--insert-parameter-desc indent
-                                       (numpydoc--arg-name element)))))
+      (numpydoc--insert-item indent
+                             (numpydoc--arg-name element)
+                             (numpydoc--arg-type element))
+      (numpydoc--insert-item-desc indent
+                                  (numpydoc--arg-name element)))))
 
 (defun numpydoc--insert-return (indent fnret)
   "Insert FNRET (return) description (if exists) at INDENT level."
@@ -370,9 +370,9 @@ This function expects the cursor to be in the function body."
     (numpydoc--insert indent
                       "Raises\n"
                       "------\n")
-    (dolist (exceptstr fnexcepts)
-      (numpydoc--insert-parameter indent exceptstr)
-      (numpydoc--insert-parameter-desc indent exceptstr))))
+    (dolist (exstr fnexcepts)
+      (numpydoc--insert-item indent exstr)
+      (numpydoc--insert-item-desc indent exstr))))
 
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
