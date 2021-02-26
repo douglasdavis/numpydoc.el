@@ -1,3 +1,29 @@
+;;; test-numpydoc.el --- Testing for numpydoc.el     -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2021  Doug Davis
+
+;; Author: Doug Davis <ddavis@ddavis.io>
+;; Keywords: testing
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Testing code for numpydoc.el
+
+;;; Code:
+
 (require 'buttercup)
 (require 'numpydoc)
 
@@ -52,3 +78,6 @@ def somelongerfunc(
       (expect a2 :to-equal (nth 1 args))
       (expect a3 :to-equal (nth 2 args))
       (expect ret :to-equal "Tuple[int, float]"))))
+
+(provide 'test-numpydoc)
+;;; test-numpydoc.el ends here
