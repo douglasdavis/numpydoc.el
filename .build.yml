@@ -1,0 +1,19 @@
+image: archlinux
+packages:
+- emacs
+sources:
+- https://github.com/douglasdavis/numpydoc.el.git
+tasks:
+- eldev: |
+    git clone https://github.com/doublep/eldev.git
+    cd eldev
+    mkdir -p $HOME/eldev-install
+    ./install.sh $HOME/eldev-install
+- test: |
+    export PATH=/home/build/eldev-install:$PATH
+    cd numpydoc.el
+    eldev -p -dtT compile
+    eldev -p -dtT test
+- action: email
+  condition: failure
+  to: "<ddavis@ddavis.io>"
