@@ -12,7 +12,10 @@ function corresponding to the current cursor location) and detects
 argument names, argument type hints, and return type hints. The
 default behavior is to prompt the user (in the minibuffer) for a
 (short and long) description of the function, and a description for
-each argument and the returned value. If the prompt is off
+each argument and the returned value. If exceptions are detected in
+the function body (and `numpydoc-insert-raises-block` is `t`),
+exceptions are added to the docstring (with the same prompt behavior
+used for function arguments). If the prompt is off
 (`numpydoc-prompt-for-input` is `nil`), then some customizable
 template text will be inserted into the docstring. If an existing
 docstring is detected, you'll be asked if you'd like to delete it and
@@ -38,6 +41,11 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dt>numpydoc-insert-examples-block</dt>
   <dd>
   If <code>t</code> an Examples block will be added to the docstring.
+  </dd>
+  <dt>numpydoc-insert-raises-block</dt>
+  <dd>
+  If <code>t</code> a Raises bock will be added to the docstring if
+  exceptions are detected in the function body.
   </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
@@ -81,6 +89,9 @@ def plot_histogram(
     flow: bool = False,
     ax: Optional[plt.Axes] = None,
 ) -> Tuple[plt.Figure, plt.Axes]:
+    if weights is not None:
+        if weights.shape != np.shape:
+            raise ValueError("x and weights must have same shape.")
     pass
 ```
 
@@ -111,7 +122,7 @@ def plot_histogram(
         FIXME: Add docs.
     flow : bool
         FIXME: Add docs.
-    ax : plt.Axes
+    ax : Optional[plt.Axes]
         FIXME: Add docs.
 
     Returns
@@ -119,11 +130,19 @@ def plot_histogram(
     Tuple[plt.Figure, plt.Axes]
         FIXME: Add docs.
 
+    Raises
+    ------
+    ValueError
+        FIXME: Add docs.
+
     Examples
     --------
     FIXME: Add docs.
 
     """
+    if weights is not None:
+        if weights.shape != np.shape:
+            raise ValueError("x and weights must have same shape.")
     pass
 ```
 
