@@ -25,16 +25,16 @@
 
 ;;; Commentary:
 
-;; This package provides a single public function to automatically
-;; generate NumPy style docstrings for Python functions:
-;; `numpydoc-generate'. The NumPy docstring style guide can be found
-;; at https://numpydoc.readthedocs.io/en/latest/format.html
+;; This package provides a function to automatically generate NumPy
+;; style docstrings for Python functions: `numpydoc-generate'. The
+;; NumPy docstring style guide can be found at
+;; https://numpydoc.readthedocs.io/en/latest/format.html
 ;;
 ;; Customizations include opting in or out of a minibuffer prompt for
-;; entering various components of the docstring, templates for when
-;; opting out of the prompt, the quoting style used, and whether or
-;; not to include an Examples block. See the `numpydoc' customization
-;; group.
+;; entering various components of the docstring (which can be toggled
+;; with `numpydoc-toggle-prompt'), templates for when opting out of
+;; the prompt, the quoting style used, and whether or not to include
+;; an Examples block. See the `numpydoc' customization group.
 
 ;;; Code:
 
@@ -163,10 +163,9 @@ The argument takes on one of four possible styles:
                (setq cursor i)))))
     (setq strs (append strs (list (substring fnargs (1+ cursor)))))))
 
-
-(defun numpydoc--extract-def ()
+(defun numpydoc--extract-def-sig ()
   "Extract function definition string from the buffer.
-This function expects the cursor to be in the function body."
+This function assumes the cursor to be in the function body."
   (save-excursion
     (buffer-substring-no-properties
      (progn
@@ -210,7 +209,8 @@ This function expects the cursor to be in the function body."
       (make-numpydoc--def :args args :rtype rtype :raises exceptions))))
 
 (defun numpydoc--has-existing-docstring-p ()
-  "Check if an existing docstring is detected."
+  "Check for an existing docstring.
+This function assumes the cursor to be in the function body."
   (save-excursion
     (python-nav-beginning-of-defun)
     (python-nav-end-of-statement)
@@ -226,7 +226,8 @@ This function expects the cursor to be in the function body."
          t)))
 
 (defun numpydoc--detect-indent ()
-  "Detect necessary indent for current function docstring."
+  "Detect necessary indent for current function docstring.
+This function assumes the cursor to be in the function body."
   (save-excursion
     (let ((beg (progn
                  (python-nav-beginning-of-defun)
@@ -237,19 +238,22 @@ This function expects the cursor to be in the function body."
       (+ python-indent-offset (- ind beg)))))
 
 (defun numpydoc--fnsig-range ()
-  "Find the beginning and end of the function signature."
+  "Find the beginning and end of the function signature.
+This function assumes the cursor to be in the function body."
   (save-excursion
     (vector (progn (python-nav-beginning-of-defun) (point))
             (progn (python-nav-end-of-statement) (point)))))
 
 (defun numpydoc--function-range ()
-  "Find the beginning and end of the function definition."
+  "Find the beginning and end of the function definition.
+This function assumes the cursor to be in the function body."
   (save-excursion
     (vector (progn (python-nav-beginning-of-defun) (point))
             (progn (python-nav-end-of-defun) (point)))))
 
 (defun numpydoc--find-exceptions ()
-  "Find exceptions in the function body (depends on cursor position)."
+  "Find exceptions in the function body.
+This function assumes the cursor to be in the function body."
   (save-excursion
     (let ((lines '())
           (fnrange (numpydoc--function-range))
@@ -419,10 +423,12 @@ This function expects the cursor to be in the function body."
 
 ;;;###autoload
 (defun numpydoc-generate ()
-  "Generate NumPy style docstring for Python function."
+  "Generate NumPy style docstring for Python function.
+Assumes that the current location of the cursor is somewhere in the
+function that is being documented."
   (interactive)
   (let ((good-to-go t)
-        (fnsig (numpydoc--extract-def)))
+        (fnsig (numpydoc--extract-def-sig)))
     (when (numpydoc--has-existing-docstring-p)
       (if (y-or-n-p "Docstring exists; destroy and start new? ")
           (numpydoc--delete-existing)
