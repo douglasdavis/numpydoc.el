@@ -53,7 +53,9 @@
   :prefix "numpydoc-")
 
 (defcustom numpydoc-prompt-for-input t
-  "If t, use minibuffer prompt to enter some docstring components."
+  "If t, use minibuffer prompt to enter some docstring components.
+An interactive convenience function, `numpydoc-toggle-prompt', is
+provided to toggle this value via command execution."
   :group 'numpydoc
   :type 'boolean)
 

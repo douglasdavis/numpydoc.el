@@ -30,7 +30,9 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dd>
   If <code>t</code> you will be prompted to enter a short description
   and long description, a description for each function argument, and
-  a description for the return (if a return type hint is provided).
+  a description for the return (if a return type hint is provided). An
+  interactive convenience function is provided to toggle the value of
+  this variable.
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
