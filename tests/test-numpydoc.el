@@ -27,17 +27,19 @@
 (require 'buttercup)
 (require 'numpydoc)
 
-(defvar fsig1
-  "def f(a: int, b: float = 5.5, c: Optional[Union[str, int]] = None) -> float:")
-(defvar fsig2 "def f(x, y=5, z=None):")
-(defvar fsig3 "\
+
+(describe "Function signature parsing"
+  :var ((fsig1 "\
+def f(
+    a: int, b: float = 5.5, c: Optional[Union[str, int]] = None
+) -> float:")
+        (fsig2 "def f(x, y=5, z=None):")
+        (fsig3 "\
 def somelongerfunc(
     a1: np.ndarray,
     a2: Optional[np.ndarray] = None,
     a3: Optional[Sequence[float]] = None,
-) -> Tuple[int, float]:")
-
-(describe "Arg check"
+) -> Tuple[int, float]:"))
   (it "Checks arg parsing 1"
     (let ((a (make-numpydoc--arg :name "a" :type "int" :defval nil))
           (b (make-numpydoc--arg :name "b" :type "float" :defval "5.5"))
