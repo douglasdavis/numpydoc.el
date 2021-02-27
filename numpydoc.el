@@ -53,7 +53,24 @@
   :prefix "numpydoc-")
 
 (defcustom numpydoc-prompt-for-input t
-  "If t you will be prompted to enter necessary descriptions."
+  "If t, use minibuffer prompt to enter some docstring components."
+  :group 'numpydoc
+  :type 'boolean)
+
+(defcustom numpydoc-quote-char ?\"
+  "Character for docstring quoting style (double or single quote)."
+  :group 'numpydoc
+  :type 'character)
+
+(defcustom numpydoc-insert-examples-block t
+  "Flag to control if Examples section is inserted into the buffer."
+  :group 'numpydoc
+  :type 'boolean)
+
+(defcustom numpydoc-insert-raises-block t
+  "Flag to control if the Raises section is inserted.
+This section will only be inserted if the flag is on and the function
+body has raise statements."
   :group 'numpydoc
   :type 'boolean)
 
@@ -74,24 +91,7 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-quote-char ?\"
-  "Character for docstring quoting style (double or single quote)."
-  :group 'numpydoc
-  :type 'character)
-
-(defcustom numpydoc-insert-examples-block t
-  "Flag to control if Examples section is inserted into the buffer."
-  :group 'numpydoc
-  :type 'boolean)
-
-(defcustom numpydoc-insert-raises-block t
-  "Flag to control if the Raises section is inserted.
-This section will only be inserted if the flag is on and the function
-body has raise statements."
-  :group 'numpydoc
-  :type 'boolean)
-
-;; private implementation code.
+;;; package implementation code.
 
 (cl-defstruct numpydoc--def
   args
@@ -410,6 +410,12 @@ This function expects the cursor to be in the function body."
 ;;; public API
 
 ;;;###autoload
+(defun numpydoc-toggle-prompt ()
+  "Toggle the value of `numpydoc-prompt-for-input'."
+  (interactive)
+  (setq numpydoc-prompt-for-input (not numpydoc-prompt-for-input)))
+
+;;;###autoload
 (defun numpydoc-generate ()
   "Generate NumPy style docstring for Python function."
   (interactive)
@@ -425,5 +431,8 @@ This function expects the cursor to be in the function body."
       (numpydoc--insert-docstring (numpydoc--detect-indent)
                                   (numpydoc--parse-def fnsig)))))
 
+;; Local Variables:
+;; sentence-end-double-space: nil
+;; End:
 (provide 'numpydoc)
 ;;; numpydoc.el ends here
