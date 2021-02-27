@@ -7,19 +7,19 @@ An Emacs Lisp package to automatically insert [NumPy style
 docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) for
 Python functions.
 
-Calling `numpydoc-generate` will parse the function signature (for the
-function corresponding to the current cursor location) and detects
-argument names, argument type hints, and return type hints. The
-default behavior is to prompt the user (in the minibuffer) for a
-(short and long) description of the function, and a description for
-each argument and the returned value. If exceptions are detected in
-the function body (and `numpydoc-insert-raises-block` is `t`),
-exceptions are added to the docstring (with the same prompt behavior
-used for function arguments). If the prompt is off
-(`numpydoc-prompt-for-input` is `nil`), then some customizable
-template text will be inserted into the docstring. If an existing
-docstring is detected, you'll be asked if you'd like to delete it and
-start fresh.
+Calling `numpydoc-generate` parses a function signature and body
+(corresponding to the current cursor location; just have the cursor
+somewhere in the function you want to document) detecting argument
+names, type hints, exceptions, and the return type hint. This
+information is used to generate a docstring.
+
+The default behavior is to prompt the user, in the minibuffer, for a
+(short and long) description of the function, a description for each
+function argument, a description for each possible exception, and the
+returned value. If the prompt is off (`numpydoc-prompt-for-input` is
+`nil`), then some customizable template text will be inserted into the
+docstring. If an existing docstring is detected, you'll be asked if
+you'd like to delete it and start fresh.
 
 ## Customization
 
