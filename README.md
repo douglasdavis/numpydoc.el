@@ -155,3 +155,6 @@ def plot_histogram(
 - [sphinx-doc.el](https://github.com/naiquevin/sphinx-doc.el): Inserts
   sphinx-compatible docstrings (does not offer customizations or
   automatically formatted insertions from minibuffer prompt).
+- [docstr](https://github.com/jcs-elpa/docstr): Docstring insertion
+  support for any programming language, including NumPy style Python
+  (it has a programmable interface).
