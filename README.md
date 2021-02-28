@@ -157,4 +157,5 @@ def plot_histogram(
   automatically formatted insertions from minibuffer prompt).
 - [docstr](https://github.com/jcs-elpa/docstr): Docstring insertion
   support for any programming language, including NumPy style Python
-  (it has a programmable interface).
+  (it has a programmable interface but requires a bit more setup to
+  get the utility provided `numpydoc.el`).
