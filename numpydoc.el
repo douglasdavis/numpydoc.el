@@ -5,7 +5,7 @@
 ;; Author: Doug Davis <ddavis@ddavis.io>
 ;; Maintainer: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
-;; License: GPL-3.0-or-later
+;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
