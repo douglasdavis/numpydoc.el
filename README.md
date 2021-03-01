@@ -23,6 +23,30 @@ returned value. If the prompt is off (`numpydoc-prompt-for-input` is
 docstring. If an existing docstring is detected, you'll be asked if
 you'd like to delete it and start fresh.
 
+## Setup
+
+Pick your favorite method of Emacs Lisp package setup:
+
+```elisp
+;; use-package with :ensure t to intall from MELPA.
+(use-package numpydoc
+  :ensure t
+  :after python)
+
+;; use the straight.el package manager.
+(straight-use-package 'numpydoc)
+
+;; clone the git respository and require
+(add-to-list 'load-path "/path/to/numpydoc.el")
+(eval-after-load 'python
+  (require 'numpydoc))
+
+;; or point use-package to the local clone
+(use-package numpydoc
+  :load-path "/path/to/numpydoc.el"
+  :after python)
+```
+
 ## Customization
 
 See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
