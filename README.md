@@ -38,8 +38,7 @@ Pick your favorite method of Emacs Lisp package setup:
 
 ;; clone the git respository and require
 (add-to-list 'load-path "/path/to/numpydoc.el")
-(eval-after-load 'python
-  (require 'numpydoc))
+(require 'numpydoc)
 
 ;; or point use-package to the local clone
 (use-package numpydoc
