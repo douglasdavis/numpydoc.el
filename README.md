@@ -46,6 +46,23 @@ Pick your favorite method of Emacs Lisp package setup:
   :after python)
 ```
 
+The `C-c C-n` binding is vacant (not used in `python.el`, as of
+writing this), so you may want to give yourself a convenient shortcut:
+
+```elisp
+;; with use-package
+(use-package numpydoc
+  :ensure t
+  :after python
+  :bind (:map python-mode-map
+              ("C-c C-n" . numpydoc-generate)))
+
+;; without
+(add-to-list 'load-path "/path/to/numpydoc.el")
+(require 'numpydoc)
+(define-key python-mode-map (kbd "C-c C-n") #'numpydoc-generate)
+```
+
 ## Customization
 
 See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
