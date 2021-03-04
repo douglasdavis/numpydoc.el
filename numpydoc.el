@@ -310,7 +310,9 @@ This function assumes the cursor to be in the function body."
     (beginning-of-line)
     (if numpydoc-prompt-for-input
         (progn
-          (setq ld (read-string "Long description: " nil nil "" nil))
+          (setq ld (read-string (concat "Long description "
+                                        "(or press return to skip): ")
+                                nil nil "" nil))
           (unless (string-empty-p ld)
             (insert "\n")
             (numpydoc--insert indent ld)
