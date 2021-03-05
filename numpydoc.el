@@ -126,11 +126,9 @@ text, and below the Examples section."
   "Temporary text to be replaced for yasnippet usage.")
 
 (defun numpydoc--prompt-p ()
-  (declare (pure t) (side-effect-free t))
   (eq numpydoc-insertion-helper 'prompt))
 
 (defun numpydoc--yas-p ()
-  (declare (pure t) (side-effect-free t))
   (eq numpydoc-insertion-helper 'yas))
 
 (defun numpydoc--arg-str-to-struct (argstr)
