@@ -38,15 +38,6 @@
 ;; 2. yasnippet expansion (requires `yasnippet' to be installed)
 ;; 3. Nothing (some template text is inserted).
 ;;
-;; Option 1 will be used if `numpydoc-prompt-for-input' is t, option 2
-;; will be used if `numpydoc-use-yasnippet' is t, and option 3 will be
-;; used if both are nil. If option 3 is used other customizations are
-;; tunable for the template text that is inserted; see the
-;; customization options.
-;;
-;; Some toggling functions are available to interactively an insertion
-;; options:
-;;
 ;; ...
 ;;
 ;;; Code:
@@ -69,12 +60,16 @@
   :group 'convenience
   :prefix "numpydoc-")
 
-(defcustom numpydoc-prompt-for-input t
-  "If t, use minibuffer prompt to enter some docstring components.
-An interactive convenience function, `numpydoc-toggle-prompt', is
-provided to toggle this value via command execution."
+(defcustom numpydoc-insertion-helper 'prompt
+  "Which insertion guide to use when generating the docstring.
+When set to 'prompt the minibuffer will be used to prompt for
+docstring components. Setting to 'yas requires yasnippet to be
+installed and `yas-expand-snippet' will be used to insert components.
+When nil, template text will be inserted."
   :group 'numpydoc
-  :type 'boolean)
+  :type '(choice (const :tag "None" nil)
+                 (const :tag "Prompt" prompt)
+                 (const :tag "Yasnippet" yas)))
 
 (defcustom numpydoc-quote-char ?\"
   "Character for docstring quoting style (double or single quote)."
@@ -115,12 +110,6 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-use-yasnippet nil
-  "Enable yasnippet for component insertion.
-This functionality is currently experimental."
-  :group 'numpydoc
-  :type 'string)
-
 ;;; package implementation code.
 
 (cl-defstruct numpydoc--def
@@ -136,9 +125,17 @@ This functionality is currently experimental."
 (defconst numpydoc--yas-replace-pat "--NPDOCYAS--"
   "Temporary text to be replaced for yasnippet usage.")
 
+(defun numpydoc--prompt-p ()
+  (declare (pure t) (side-effect-free t))
+  (eq numpydoc-insertion-helper 'prompt))
+
+(defun numpydoc--yas-p ()
+  (declare (pure t) (side-effect-free t))
+  (eq numpydoc-insertion-helper 'yas))
+
 (defun numpydoc--check-knobs ()
   "Check the logic of the prompt/yas options."
-  (when (and numpydoc-use-yasnippet numpydoc-prompt-for-input)
+  (when (and (numpydoc--yas-p) (numpydoc--prompt-p))
     (numpydoc-toggle-prompt)))
 
 (defun numpydoc--arg-str-to-struct (argstr)
@@ -333,14 +330,14 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--insert-short-and-long-desc (indent)
   "Insert short description with INDENT level."
   (let ((ld nil)
-        (tmps (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+        (tmps (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-short)))
-        (tmpl (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+        (tmpl (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-long))))
     (insert "\n")
     (numpydoc--insert indent
                       (concat (make-string 3 numpydoc-quote-char)
-                              (if numpydoc-prompt-for-input
+                              (if (numpydoc--prompt-p)
                                   (read-string
                                    (format "Short description: "))
                                 tmps)
@@ -348,7 +345,7 @@ This function assumes the cursor to be in the function body."
                       (make-string 3 numpydoc-quote-char))
     (forward-line -1)
     (beginning-of-line)
-    (if numpydoc-prompt-for-input
+    (if (numpydoc--prompt-p)
         (progn
           (setq ld (read-string (concat "Long description "
                                         "(or press return to skip): ")
@@ -372,10 +369,10 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--insert-item-and-type (indent name type)
   "Insert parameter with NAME and TYPE at level INDENT."
   (let ((tp type)
-        (tmpt (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+        (tmpt (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-type-desc))))
     (unless tp
-      (setq tp (if numpydoc-prompt-for-input
+      (setq tp (if (numpydoc--prompt-p)
                    (read-string (format "Type of %s: "
                                         name))
                  tmpt)))
@@ -383,10 +380,10 @@ This function assumes the cursor to be in the function body."
 
 (defun numpydoc--insert-item-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
-  (let* ((tmpd (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+  (let* ((tmpd (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                      (t numpydoc-template-desc)))
          (desc (concat (make-string 4 ?\s)
-                      (if numpydoc-prompt-for-input
+                      (if (numpydoc--prompt-p)
                           (read-string (format "Description for %s: "
                                                element))
                         tmpd))))
@@ -410,7 +407,7 @@ This function assumes the cursor to be in the function body."
 
 (defun numpydoc--insert-return (indent fnret)
   "Insert FNRET (return) description (if exists) at INDENT level."
-  (let ((tmpr (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+  (let ((tmpr (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-desc))))
     (when (and fnret (not (string= fnret "None")))
       (insert "\n")
@@ -421,7 +418,7 @@ This function assumes the cursor to be in the function body."
       (insert "\n")
       (numpydoc--insert indent
                         (concat (make-string 4 ?\s)
-                                (if numpydoc-prompt-for-input
+                                (if (numpydoc--prompt-p)
                                     (read-string "Description for return: ")
                                   tmpr)))
       (numpydoc--fill-last-insertion)
@@ -440,7 +437,7 @@ This function assumes the cursor to be in the function body."
 
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
-  (let ((tmpd (cond (numpydoc-use-yasnippet numpydoc--yas-replace-pat)
+  (let ((tmpd (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-desc))))
     (when numpydoc-insert-examples-block
       (insert "\n")
@@ -485,7 +482,7 @@ This function assumes the cursor to be in the function body."
   (numpydoc--insert-exceptions indent (numpydoc--def-raises fndef))
   (numpydoc--insert-examples indent)
   (numpydoc--check-knobs)
-  (when numpydoc-use-yasnippet
+  (when (numpydoc--yas-p)
     (numpydoc--yasnippetfy)))
 
 (defun numpydoc--delete-existing ()
@@ -507,24 +504,22 @@ This function assumes the cursor to be in the function body."
 ;;; public API
 
 ;;;###autoload
-(defun numpydoc-toggle-prompt ()
-  "Toggle the value of `numpydoc-prompt-for-input'.
-If this triggers `numpydoc-prompt-for-input' to a t state, then
-`numpydoc-use-yasnippet' will be disabled (set to nil)."
+(defun numpydoc-use-yasnippet ()
+  "Enable yasnippet insertion (see `numpydoc-insertion-helper')."
   (interactive)
-  (setq numpydoc-prompt-for-input (not numpydoc-prompt-for-input))
-  (when (and numpydoc-prompt-for-input numpydoc-use-yasnippet)
-    (setq numpydoc-use-yasnippet nil)))
+  (setq numpydoc-insertion-helper 'yas))
 
 ;;;###autoload
-(defun numpydoc-toggle-yasnippet ()
-  "Toggle the value of `numpydoc-use-yasnippet'.
-IF this triggers `numpydoc-use-yasnippet' to a t state, then
-`numpydoc-prompt-for-input' will be disabled (set to nil)."
+(defun numpydoc-use-prompt ()
+  "Enable minibuffer prompt insertion (see `numpydoc-insertion-helper')."
   (interactive)
-  (setq numpydoc-use-yasnippet (not numpydoc-use-yasnippet))
-  (when (and numpydoc-use-yasnippet numpydoc-prompt-for-input)
-    (setq numpydoc-prompt-for-input nil)))
+  (setq numpydoc-insertion-helper 'prompt))
+
+;;;###autoload
+(defun numpydoc-use-templates ()
+  "Enable template text insertion (see `numpydoc-insertion-helper')."
+  (interactive)
+  (setq numpydoc-insertion-helper nil))
 
 ;;;###autoload
 (defun numpydoc-generate ()
