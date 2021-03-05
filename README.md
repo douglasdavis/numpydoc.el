@@ -20,7 +20,9 @@ description for the return. It's also possible to either disable the
 minibuffer prompt or use
 [yasnippet](https://github.com/joaotavora/yasnippet) insertion. See
 [customization](#customization) for more information. You'll also find
-a few [examples](#examples) below.
+a few [examples](#examples) below. See the
+[NEWS](https://github.com/douglasdavis/numpydoc.el/blob/main/NEWS)
+file to see recent changes.
 
 ## Setup
 
