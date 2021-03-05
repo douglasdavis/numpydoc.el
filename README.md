@@ -68,12 +68,18 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
 <dl>
   <dt>numpydoc-insertion-helper</dt>
   <dd>
-  The method used to insert components of the docstring (default is `'prompt`).
-  - `'prompt` will trigger a request for each description in the minibuffer.
-  - `'yas` (requires `yasnippet` to be installed) will generate a
-    template and call `yas-expand-snippet`, providing an insertion
-    method familiar to `yasnippet` users.
-  - `nil` will disable any interactive insertion (template text will be inserted).
+  The method used to insert components of the docstring (default is
+  <code>'prompt</code>).
+  <ul>
+  <li> <code>'prompt</code> will trigger a request for each description
+    in the minibuffer.</li>
+  <li> <code>'yas</code> (requires <code>yasnippet</code> to be
+    installed) will generate a template and call
+    <code>yas-expand-snippet</code>, providing an insertion method
+    familiar to <code>yasnippet</code> users.</li>
+  <li> <code>nil</code> will disable any interactive insertion (template
+    text will be inserted).</li>
+  </ul>
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>
