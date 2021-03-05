@@ -66,7 +66,7 @@ writing this), so you may want to give yourself a convenient shortcut:
 See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
 
 <dl>
-  <dt>numpydoc-insertion-helper</dt>
+  <dt>numpydoc-insertion-style</dt>
   <dd>
   The method used to insert components of the docstring (default is
   <code>'prompt</code>).

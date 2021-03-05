@@ -38,7 +38,7 @@
 ;; 3. Nothing (template text is inserted).
 ;;
 ;; Convenience functions are provided to interactively configure the
-;; insertion helper symbol:
+;; insertion style symbol:
 ;; - `numpydoc-use-prompt'
 ;; - `numpydoc-use-yasnippet'
 ;; - `numpydoc-use-templates'
@@ -63,7 +63,7 @@
   :group 'convenience
   :prefix "numpydoc-")
 
-(defcustom numpydoc-insertion-helper 'prompt
+(defcustom numpydoc-insertion-style 'prompt
   "Which insertion guide to use when generating the docstring.
 When set to 'prompt the minibuffer will be used to prompt for
 docstring components. Setting to 'yas requires yasnippet to be
@@ -129,10 +129,10 @@ text, and below the Examples section."
   "Temporary text to be replaced for yasnippet usage.")
 
 (defun numpydoc--prompt-p ()
-  (eq numpydoc-insertion-helper 'prompt))
+  (eq numpydoc-insertion-style 'prompt))
 
 (defun numpydoc--yas-p ()
-  (eq numpydoc-insertion-helper 'yas))
+  (eq numpydoc-insertion-style 'yas))
 
 (defun numpydoc--arg-str-to-struct (argstr)
   "Convert ARGSTR to an instance of `numpydoc--arg'.
@@ -500,21 +500,21 @@ This function assumes the cursor to be in the function body."
 
 ;;;###autoload
 (defun numpydoc-use-yasnippet ()
-  "Enable yasnippet insertion (see `numpydoc-insertion-helper')."
+  "Enable yasnippet insertion (see `numpydoc-insertion-style')."
   (interactive)
-  (setq numpydoc-insertion-helper 'yas))
+  (setq numpydoc-insertion-style 'yas))
 
 ;;;###autoload
 (defun numpydoc-use-prompt ()
-  "Enable minibuffer prompt insertion (see `numpydoc-insertion-helper')."
+  "Enable minibuffer prompt insertion (see `numpydoc-insertion-style')."
   (interactive)
-  (setq numpydoc-insertion-helper 'prompt))
+  (setq numpydoc-insertion-style 'prompt))
 
 ;;;###autoload
 (defun numpydoc-use-templates ()
-  "Enable template text insertion (see `numpydoc-insertion-helper')."
+  "Enable template text insertion (see `numpydoc-insertion-style')."
   (interactive)
-  (setq numpydoc-insertion-helper nil))
+  (setq numpydoc-insertion-style nil))
 
 ;;;###autoload
 (defun numpydoc-generate ()
