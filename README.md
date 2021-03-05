@@ -13,13 +13,14 @@ can be anywhere in the function body). The parsing detects argument
 names, type hints, exceptions, and the return type hint. This
 information is used to generate a docstring.
 
-The default behavior is to prompt the user (in the minibuffer), for a
+The default behavior is to prompt the user (in the minibuffer) for a
 short & long description of the function, a description for each
 function argument, a description for each possible exception, and a
 description for the return. It's also possible to either disable the
 minibuffer prompt or use
-[yasnippet](https://github.com/joaotavora/yasnippet). See
-[customization](#customization) for configuration options.
+[yasnippet](https://github.com/joaotavora/yasnippet) insertion. See
+[customization](#customization) for more information. You'll also find
+a few [examples](#examples) below.
 
 ## Setup
 
