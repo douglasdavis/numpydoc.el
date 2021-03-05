@@ -133,11 +133,6 @@ text, and below the Examples section."
   (declare (pure t) (side-effect-free t))
   (eq numpydoc-insertion-helper 'yas))
 
-(defun numpydoc--check-knobs ()
-  "Check the logic of the prompt/yas options."
-  (when (and (numpydoc--yas-p) (numpydoc--prompt-p))
-    (numpydoc-toggle-prompt)))
-
 (defun numpydoc--arg-str-to-struct (argstr)
   "Convert ARGSTR to an instance of `numpydoc--arg'.
 The argument takes on one of four possible styles:
@@ -481,7 +476,6 @@ This function assumes the cursor to be in the function body."
   (numpydoc--insert-return indent (numpydoc--def-rtype fndef))
   (numpydoc--insert-exceptions indent (numpydoc--def-raises fndef))
   (numpydoc--insert-examples indent)
-  (numpydoc--check-knobs)
   (when (numpydoc--yas-p)
     (numpydoc--yasnippetfy)))
 
