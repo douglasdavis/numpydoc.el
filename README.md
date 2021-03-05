@@ -127,7 +127,13 @@ will prompt for input in the minibuffer (notice how long text is
 automatically paragraph-filled):
 
 <p align="center">
-<img src="doc/example.gif" style="border-radius:10px"/>
+  <img src="doc/ex1.gif"/>
+</p>
+
+Or, using `yasnippet`:
+
+<p align="center">
+  <img src="doc/ex2.gif"/>
 </p>
 
 Or, <kbd>M-x numpydoc-generate</kbd> with
