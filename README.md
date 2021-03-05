@@ -1,7 +1,6 @@
 # numpydoc.el
 
 [![MELPA](https://melpa.org/packages/numpydoc-badge.svg)](https://melpa.org/#/numpydoc)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CI](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml/badge.svg)](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml)
 [![builds.sr.ht status](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml.svg)](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml?)
 
@@ -105,6 +104,12 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dt>numpydoc-template-desc</dt>
   <dd>
   Template text that will be used for each function argument
+  description if <code>numpydoc-prompt-for-input</code> is
+  <code>nil</code>.
+  </dd>
+  <dt>numpydoc-template-type-desc</dt>
+  <dd>
+  Template text that will be used for each function argument type
   description if <code>numpydoc-prompt-for-input</code> is
   <code>nil</code>.
   </dd>

@@ -93,6 +93,11 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
 
+(defcustom numpydoc-template-type-desc "FIXME: Add type."
+  "Template text for individual component type descriptions."
+  :group 'numpydoc
+  :type 'string)
+
 ;;; package implementation code.
 
 (cl-defstruct numpydoc--def
@@ -329,6 +334,16 @@ This function assumes the cursor to be in the function body."
                         (format "%s : %s\n" name type)
                       (format "%s\n" name))))
 
+(defun numpydoc--insert-item-and-type (indent name type)
+  "Insert parameter with NAME and TYPE at level INDENT."
+  (let ((tp type))
+    (unless tp
+      (setq tp (if numpydoc-prompt-for-input
+                   (read-string (format "Type of %s: "
+                                        name))
+                 numpydoc-template-type-desc)))
+    (numpydoc--insert indent (format "%s : %s\n" name tp))))
+
 (defun numpydoc--insert-item-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
   (let ((desc (concat (make-string 4 ?\s)
@@ -348,9 +363,9 @@ This function assumes the cursor to be in the function body."
                       "Parameters\n"
                       "----------\n")
     (dolist (element fnargs)
-      (numpydoc--insert-item indent
-                             (numpydoc--arg-name element)
-                             (numpydoc--arg-type element))
+      (numpydoc--insert-item-and-type indent
+                                      (numpydoc--arg-name element)
+                                      (numpydoc--arg-type element))
       (numpydoc--insert-item-desc indent
                                   (numpydoc--arg-name element)))))
 
