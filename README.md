@@ -123,24 +123,21 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
 
 ## Examples
 
-<kbd>M-x numpydoc-generate</kbd> with the default configuration that
-will prompt for input in the minibuffer (notice how long text is
+<kbd>M-x numpydoc-generate</kbd> with the default configuration,
+`numpydoc-insertion-style` set to `'prompt` (notice how long text is
 automatically paragraph-filled):
 
 <p align="center">
   <img src="doc/ex1.gif" width="65%"/>
 </p>
 
-Or, using `yasnippet`:
+Using `yasnippet` (`numpydoc-insertion-style` set to `'yas`):
 
 <p align="center">
   <img src="doc/ex2.gif" width="65%"/>
 </p>
 
-Or, <kbd>M-x numpydoc-generate</kbd> with
-`numpydoc-prompt-for-input` set to `nil`:
-
-Before:
+With `numpydoc-insertion-style` set to `nil`; before:
 
 ```python
 def plot_histogram(
@@ -157,7 +154,7 @@ def plot_histogram(
     pass
 ```
 
-After:
+After <kbd>M-x numpydoc-generate</kbd>:
 
 ```python
 def plot_histogram(
