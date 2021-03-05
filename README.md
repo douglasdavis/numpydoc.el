@@ -8,19 +8,18 @@ An Emacs Lisp package to automatically insert [NumPy style
 docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) for
 Python functions.
 
-Calling `numpydoc-generate` parses a function signature and body
-(corresponding to the current cursor location; just have the cursor
-somewhere in the function you want to document) detecting argument
+Calling `numpydoc-generate` parses the function at point (the cursor
+can be anywhere in the function body). The parsing detects argument
 names, type hints, exceptions, and the return type hint. This
 information is used to generate a docstring.
 
-The default behavior is to prompt the user, in the minibuffer, for a
-(short and long) description of the function, a description for each
-function argument, a description for each possible exception, and the
-returned value. If the prompt is off (`numpydoc-prompt-for-input` is
-`nil`), then some customizable template text will be inserted into the
-docstring. If an existing docstring is detected, you'll be asked if
-you'd like to delete it and start fresh.
+The default behavior is to prompt the user (in the minibuffer), for a
+short & long description of the function, a description for each
+function argument, a description for each possible exception, and a
+description for the return. It's also possible to either disable the
+minibuffer prompt or use
+[yasnippet](https://github.com/joaotavora/yasnippet). See
+[customization](#customization) for configuration options.
 
 ## Setup
 
@@ -67,14 +66,14 @@ writing this), so you may want to give yourself a convenient shortcut:
 See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
 
 <dl>
-  <dt>numpydoc-prompt-for-input</dt>
+  <dt>numpydoc-insertion-helper</dt>
   <dd>
-  If <code>t</code> you will be prompted to enter a short description
-  and long description, a description for each function argument, and
-  a description for the return (if a return type hint is provided). An
-  interactive convenience function
-  (<code>numpydoc-toggle-prompt</code>) is provided to toggle the
-  value of this variable.
+  The method used to insert components of the docstring (default is `'prompt`).
+  - `'prompt` will trigger a request for each description in the minibuffer.
+  - `'yas` (requires `yasnippet` to be installed) will generate a
+    template and call `yas-expand-snippet`, providing an insertion
+    method familiar to `yasnippet` users.
+  - `nil` will disable any interactive insertion (template text will be inserted).
   </dd>
   <dt>numpydoc-quote-char</dt>
   <dd>

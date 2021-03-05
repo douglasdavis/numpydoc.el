@@ -30,15 +30,18 @@
 ;; NumPy docstring style guide can be found at
 ;; https://numpydoc.readthedocs.io/en/latest/format.html
 ;;
-;; After numpydoc.el detects various function components, there are
-;; three ways that one can be guided to insert descriptions for the
-;; components:
+;; There are three ways that one can be guided to insert descriptions
+;; for the components:
 ;;
 ;; 1. Minibuffer prompt (the default).
 ;; 2. yasnippet expansion (requires `yasnippet' to be installed)
-;; 3. Nothing (some template text is inserted).
+;; 3. Nothing (template text is inserted).
 ;;
-;; ...
+;; Convenience functions are provided to interactively configure the
+;; insertion helper symbol:
+;; - `numpydoc-use-prompt'
+;; - `numpydoc-use-yasnippet'
+;; - `numpydoc-use-templates'
 ;;
 ;;; Code:
 
