@@ -31,8 +31,7 @@ Pick your favorite method of Emacs Lisp package setup:
 ```elisp
 ;; use-package with :ensure t to intall from MELPA.
 (use-package numpydoc
-  :ensure t
-  :after python)
+  :ensure t)
 
 ;; use the straight.el package manager.
 (straight-use-package 'numpydoc)
@@ -43,8 +42,7 @@ Pick your favorite method of Emacs Lisp package setup:
 
 ;; or point use-package to the local clone
 (use-package numpydoc
-  :load-path "/path/to/numpydoc.el"
-  :after python)
+  :load-path "/path/to/numpydoc.el")
 ```
 
 The `C-c C-n` binding is vacant (not used in `python.el`, as of
@@ -54,7 +52,6 @@ writing this), so you may want to give yourself a convenient shortcut:
 ;; with use-package
 (use-package numpydoc
   :ensure t
-  :after python
   :bind (:map python-mode-map
               ("C-c C-n" . numpydoc-generate)))
 
