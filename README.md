@@ -102,23 +102,23 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
-  <code>numpydoc-prompt-for-input</code> is <code>nil</code>.
+  <code>numpydoc-insertion-style</code> is <code>nil</code>.
   </dd>
   <dt>numpydoc-template-long</dt>
   <dd>
   Template text that will be used as the long description if
-  <code>numpydoc-prompt-for-input</code> is <code>nil</code>.
+  <code>numpydoc-insertion-style</code> is <code>nil</code>.
   </dd>
   <dt>numpydoc-template-desc</dt>
   <dd>
   Template text that will be used for each function argument
-  description if <code>numpydoc-prompt-for-input</code> is
+  description if <code>numpydoc-insertion-style</code> is
   <code>nil</code>.
   </dd>
   <dt>numpydoc-template-type-desc</dt>
   <dd>
   Template text that will be used for each function argument type
-  description if <code>numpydoc-prompt-for-input</code> is
+  description if <code>numpydoc-insertion-style</code> is
   <code>nil</code>.
   </dd>
 </dl>
