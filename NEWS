@@ -10,7 +10,7 @@ TBD
 ** Changes
 
 *** Added support for yasnippet
-If yasnippet is installed we we `yas-expand-snippet' to on-the-fly add
+If yasnippet is installed we `yas-expand-snippet' to on-the-fly add
 the docstring components in buffer.
 
 *** Added customization `numpydoc-insertion-style'.
