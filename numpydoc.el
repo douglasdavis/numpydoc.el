@@ -35,7 +35,7 @@
 ;;
 ;; 1. Minibuffer prompt (the default).
 ;; 2. yasnippet expansion (requires `yasnippet' to be installed)
-;; 3. Nothing (placeholdingtemplate text is inserted).
+;; 3. Nothing (placeholding template text is inserted).
 ;;
 ;; Convenience functions are provided to interactively configure the
 ;; insertion style symbol:
