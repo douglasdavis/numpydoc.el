@@ -5,8 +5,8 @@
 [![builds.sr.ht status](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml.svg)](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml?)
 
 An Emacs Lisp package to automatically insert [NumPy style
-docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) for
-Python functions.
+docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) in
+Python function definitions.
 
 Calling `numpydoc-generate` parses the function at point (the cursor
 can be anywhere in the function body). The parsing detects argument
