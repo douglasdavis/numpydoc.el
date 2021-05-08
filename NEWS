@@ -18,7 +18,7 @@ Use this single customization to direct the insertion style instead of
 multiple boolean customization. Can take on:
 - 'prompt (prompt in minibuffer)
 - 'yas (use yasnippet)
-- nil (use insertion helper, just use templates)
+- nil (no insertion helper, just use templates)
 
 *** Added interactive convenience functions for toggling insertion style.
 `numpydoc-use-yasnippet', `numpydoc-use-prompt', and
