@@ -3,7 +3,10 @@ numpydoc.el NEWS -- history of user visible changes
 * Unreleased
 
 ** Changes
-TBD
+
+*** Added new defcustom: numpydoc-insert-paramter-types
+New variable controls whether the type hint is added to each argument
+in the parameters block (default is t).
 
 * 0.2.0 (Mar 5, 2021)
 
