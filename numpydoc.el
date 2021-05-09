@@ -372,12 +372,15 @@ This function assumes the cursor to be in the function body."
   (let ((tp type)
         (tmpt (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-type-desc))))
-    (unless tp
-      (setq tp (if (numpydoc--prompt-p)
-                   (read-string (format "Type of %s: "
-                                        name))
-                 tmpt)))
-    (numpydoc--insert indent (format "%s : %s\n" name tp))))
+    (if numpydoc-insert-parameter-types
+        (progn
+          (unless tp
+            (setq tp (if (numpydoc--prompt-p)
+                         (read-string (format "Type of %s: "
+                                              name))
+                       tmpt)))
+          (numpydoc--insert indent (format "%s : %s\n" name tp)))
+      (numpydoc--insert-item indent name))))
 
 (defun numpydoc--insert-item-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
