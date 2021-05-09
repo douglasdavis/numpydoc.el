@@ -96,7 +96,7 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dd>
   If <code>t</code> (the default) type hints from the function
   signature will be used to add a type to each argument in the
-  Parameters blocks of the docstring.
+  Parameters block of the docstring.
   </dd>
   <dt>numpydoc-insert-raises-block</dt>
   <dd>
