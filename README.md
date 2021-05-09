@@ -91,6 +91,11 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   <dd>
   If <code>t</code> an Examples block will be added to the docstring.
   </dd>
+  <dt>numpydoc-insert-parameter-types</dt>
+  <dd>
+  If <code>t</code> type hints from the function signature will be
+  used to add a type to each argument in the Parameters blocks.
+  </dd>
   <dt>numpydoc-insert-raises-block</dt>
   <dd>
   If <code>t</code> a Raises bock will be added to the docstring if
