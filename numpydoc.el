@@ -84,6 +84,11 @@ When nil, template text will be inserted."
   :group 'numpydoc
   :type 'boolean)
 
+(defcustom numpydoc-insert-parameter-types t
+  "Flag to control if Parameter types are inserted based on type hints."
+  :group 'numpydoc
+  :type 'boolean)
+
 (defcustom numpydoc-insert-raises-block t
   "Flag to control if the Raises section is inserted.
 This section will only be inserted if the flag is on and the function
