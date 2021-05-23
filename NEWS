@@ -2,9 +2,16 @@ numpydoc.el NEWS -- history of user visible changes
 
 * Unreleased
 
+TBD
+
+* 0.4 (May 23, 2021)
+
 ** Changes
 
-TBD
+*** Renamed numpydoc-template-desc to numpydoc-template-arg-desc
+Marked the previous custom variable as obsolete. This change makes the
+variable name consistent with the closely related variable
+`numpydoc-template-type-desc`.
 
 * 0.3.0 (May 10, 2021)
 

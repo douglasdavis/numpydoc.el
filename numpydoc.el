@@ -6,7 +6,7 @@
 ;; Maintainer: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; SPDX-License-Identifier: GPL-3.0-or-later
-;; Version: 0.3.0
+;; Version: 0.4
 ;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
 
@@ -106,7 +106,11 @@ body has raise statements."
   :group 'numpydoc
   :type 'string)
 
-(defcustom numpydoc-template-desc "FIXME: Add docs."
+(define-obsolete-variable-alias
+  'numpydoc-template-desc 'numpydoc-template-arg-desc
+  "numpydoc 0.4")
+
+(defcustom numpydoc-template-arg-desc "FIXME: Add docs."
   "Template text for individual component descriptions.
 This will be added for individual argument and return description
 text, and below the Examples section."
@@ -385,7 +389,7 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--insert-item-desc (indent element)
   "Insert ELEMENT parameter description at level INDENT."
   (let* ((tmpd (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
-                     (t numpydoc-template-desc)))
+                     (t numpydoc-template-arg-desc)))
          (desc (concat (make-string 4 ?\s)
                       (if (numpydoc--prompt-p)
                           (read-string (format "Description for %s: "
@@ -412,7 +416,7 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--insert-return (indent fnret)
   "Insert FNRET (return) description (if exists) at INDENT level."
   (let ((tmpr (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
-                    (t numpydoc-template-desc))))
+                    (t numpydoc-template-arg-desc))))
     (when (and fnret (not (string= fnret "None")))
       (insert "\n")
       (numpydoc--insert indent
@@ -442,7 +446,7 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--insert-examples (indent)
   "Insert function examples block at INDENT level."
   (let ((tmpd (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
-                    (t numpydoc-template-desc))))
+                    (t numpydoc-template-arg-desc))))
     (when numpydoc-insert-examples-block
       (insert "\n")
       (numpydoc--insert indent

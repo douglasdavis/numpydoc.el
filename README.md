@@ -113,7 +113,7 @@ See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
   Template text that will be used as the long description if
   <code>numpydoc-insertion-style</code> is <code>nil</code>.
   </dd>
-  <dt>numpydoc-template-desc</dt>
+  <dt>numpydoc-template-arg-desc</dt>
   <dd>
   Template text that will be used for each function argument
   description if <code>numpydoc-insertion-style</code> is
