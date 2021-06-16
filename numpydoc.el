@@ -154,19 +154,21 @@ The argument takes on one of four possible styles:
    containing only '='. Example would be 'x=5'.
 4. Finally the default is an untyped argument without a default
    value. Example would be `x`."
-  (cond (;; type hint and default value
+  (cond (;; type hint and default value (or maybe a dict without a typehint)
          (and (s-contains-p ":" argstr) (s-contains-p "=" argstr))
-         (let* ((comps1 (s-split ":" argstr))
-                (comps2 (s-split "=" (nth 1 comps1)))
-                (name (s-trim (car comps1)))
-                (type (s-trim (car comps2)))
-                (defval (s-trim (nth 1 comps2))))
+         (let* ((type nil)
+                (comps1 (s-split-up-to "=" argstr 1))
+                (comps2 (s-split-up-to ":" (car comps1) 1))
+                (defval (s-trim (cadr comps1)))
+                (name (s-trim (car comps2)))
+                (type (cadr comps2)))
            (make-numpydoc--arg :name name
-                               :type type
+                               :type (if type (s-trim type) nil)
                                :defval defval)))
         ;; only a typehint
-        ((string-match-p ":" argstr)
-         (let* ((comps1 (s-split ":" argstr))
+        ((and (string-match-p ":" argstr)
+              (not (s-contains-p "=" argstr)))
+         (let* ((comps1 (s-split-up-to ":" argstr 1))
                 (name (s-trim (car comps1)))
                 (type (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
@@ -174,7 +176,7 @@ The argument takes on one of four possible styles:
                                :defval nil)))
         ;; only a default value
         ((s-contains-p "=" argstr)
-         (let* ((comps1 (s-split "=" argstr))
+         (let* ((comps1 (s-split-up-to "=" argstr 1))
                 (name (s-trim (car comps1)))
                 (defval (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
@@ -188,12 +190,28 @@ The argument takes on one of four possible styles:
 (defun numpydoc--split-args (fnargs)
   "Split FNARGS on comma but ignore those in type [brackets]."
   (let ((bc 0)
+        (indquote nil)
+        (insquote nil)
         (cursor -1)
         (strs '()))
     (dotimes (i (length fnargs))
       (let ((ichar (aref fnargs i)))
         (cond ((= ichar ?\[) (setq bc (1+ bc)))
               ((= ichar ?\]) (setq bc (1- bc)))
+              ((= ichar ?\() (setq bc (1+ bc)))
+              ((= ichar ?\)) (setq bc (1- bc)))
+              ((= ichar ?\{) (setq bc (1+ bc)))
+              ((= ichar ?\}) (setq bc (1- bc)))
+              ((= ichar ?\") (if indquote
+                                 (setq bc (1- bc)
+                                       indquote nil)
+                               (setq bc (1+ bc)
+                                     indquote t)))
+              ((= ichar ?\') (if insquote
+                                 (setq bc (1- bc)
+                                       insquote nil)
+                               (setq bc (1+ bc)
+                                     insquote t)))
               ((and (= ichar ?,) (= bc 0))
                (setq strs (append strs (list (substring fnargs
                                                         (1+ cursor)

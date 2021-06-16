@@ -39,7 +39,20 @@ def somelongerfunc(
     a1: np.ndarray,
     a2: Optional[np.ndarray] = None,
     a3: Optional[Sequence[float]] = None,
-) -> Tuple[int, float]:"))
+) -> Tuple[int, float]:")
+        (fsig4 "\
+def f(
+    aa,
+    bb=(4, 6),
+    cc: set = {1, 2},
+    dd: Dict[str, int] = dict(a=1, b=2, c = 3),
+    ee: Dict[str, int] = {\"a\": 5, \"b\": 6},
+    ff={\"a\": 5, \"b\": 6},
+    gg=\"str,str\",
+    hh: str = \"str, str, str, str\",
+    ii: Tuple[int, ...] = (4, 6),
+    jj: str = \"str,str\",
+)"))
   (it "Checks arg parsing 1"
     (let ((a (make-numpydoc--arg :name "a" :type "int" :defval nil))
           (b (make-numpydoc--arg :name "b" :type "float" :defval "5.5"))
@@ -79,7 +92,51 @@ def somelongerfunc(
       (expect a1 :to-equal (car args))
       (expect a2 :to-equal (nth 1 args))
       (expect a3 :to-equal (nth 2 args))
-      (expect ret :to-equal "Tuple[int, float]"))))
+      (expect ret :to-equal "Tuple[int, float]")))
+
+  (it "Checks arg parsing 4"
+      (let ((aa (make-numpydoc--arg :name "aa"
+                                    :type nil
+                                    :defval nil))
+            (bb (make-numpydoc--arg :name "bb"
+                                    :type nil
+                                    :defval "(4, 6)"))
+            (cc (make-numpydoc--arg :name "cc"
+                                    :type "set"
+                                    :defval "{1, 2}"))
+            (dd (make-numpydoc--arg :name "dd"
+                                    :type "Dict[str, int]"
+                                    :defval "dict(a=1, b=2, c = 3)"))
+            (ee (make-numpydoc--arg :name "ee"
+                                    :type "Dict[str, int]"
+                                    :defval "{\"a\": 5, \"b\": 6}"))
+            (ff (make-numpydoc--arg :name "ff"
+                                    :type nil
+                                    :defval "{\"a\": 5, \"b\": 6}"))
+            (gg (make-numpydoc--arg :name "gg"
+                                    :type nil
+                                    :defval "\"str,str\""))
+            (hh (make-numpydoc--arg :name "hh"
+                                    :type "str"
+                                    :defval "\"str, str, str, str\""))
+            (ii (make-numpydoc--arg :name "ii"
+                                    :type "Tuple[int, ...]"
+                                    :defval "(4, 6)"))
+            (jj (make-numpydoc--arg :name "jj"
+                                    :type "str"
+                                    :defval "\"str,str\""))
+            (args (numpydoc--def-args (numpydoc--parse-def fsig4))))
+
+        (expect aa :to-equal (car args))
+        (expect bb :to-equal (nth 1 args))
+        (expect cc :to-equal (nth 2 args))
+        (expect dd :to-equal (nth 3 args))
+        (expect ee :to-equal (nth 4 args))
+        (expect ff :to-equal (nth 5 args))
+        (expect gg :to-equal (nth 6 args))
+        (expect hh :to-equal (nth 7 args))
+        (expect ii :to-equal (nth 8 args))
+        (expect jj :to-equal (nth 9 args)))))
 
 (provide 'test-numpydoc)
 ;;; test-numpydoc.el ends here
