@@ -4,7 +4,7 @@ numpydoc.el NEWS -- history of user visible changes
 
 ** Fixed bugs
 
-*** Parsing default arguments containing commas or colon
+*** Parsing default arguments containing punctuation
 Arguments with commas surrounded by either quotes (strings), braces
 (dict or set), or parentheses (tuples) were causing bad docstrings.
 Default dicts with colons were also causing bad docstrings. (Issue
