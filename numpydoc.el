@@ -190,7 +190,8 @@ The argument takes on one of four possible styles:
 (defun numpydoc--split-args (fnargs)
   "Split FNARGS on comma but ignore those in type [brackets]."
   (let ((bc 0)
-        (inquote nil)
+        (indquote nil)
+        (insquote nil)
         (cursor -1)
         (strs '()))
     (dotimes (i (length fnargs))
@@ -201,12 +202,18 @@ The argument takes on one of four possible styles:
               ((= ichar ?\)) (setq bc (1- bc)))
               ((= ichar ?\{) (setq bc (1+ bc)))
               ((= ichar ?\}) (setq bc (1- bc)))
-              ((= ichar ?\") (if inquote
+              ((= ichar ?\") (if indquote
                                  (progn
                                    (setq bc (1- bc)
-                                         inquote nil))
+                                         indquote nil))
                                (setq bc (1+ bc)
-                                     inquote t)))
+                                     indquote t)))
+              ((= ichar ?\') (if insquote
+                                 (progn
+                                   (setq bc (1- bc)
+                                         insquote nil))
+                               (setq bc (1+ bc)
+                                     insquote t)))
               ((and (= ichar ?,) (= bc 0))
                (setq strs (append strs (list (substring fnargs
                                                         (1+ cursor)
