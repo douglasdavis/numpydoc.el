@@ -157,9 +157,9 @@ The argument takes on one of four possible styles:
   (cond (;; type hint and default value (or maybe a dict without a typehint)
          (and (s-contains-p ":" argstr) (s-contains-p "=" argstr))
          (let* ((type nil)
-                (comps1 (s-split "=" argstr))
-                (comps2 (s-split ":" (nth 0 comps1)))
-                (defval (s-trim (nth 1 comps1)))
+                (comps1 (s-split-up-to "=" argstr 1))
+                (comps2 (s-split-up-to ":" (car comps1) 1))
+                (defval (s-trim (cadr comps1)))
                 (name (s-trim (car comps2)))
                 (type (cadr comps2)))
            (make-numpydoc--arg :name name
@@ -168,7 +168,7 @@ The argument takes on one of four possible styles:
         ;; only a typehint
         ((and (string-match-p ":" argstr)
               (not (s-contains-p "=" argstr)))
-         (let* ((comps1 (s-split ":" argstr))
+         (let* ((comps1 (s-split-up-to ":" argstr 1))
                 (name (s-trim (car comps1)))
                 (type (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
@@ -176,7 +176,7 @@ The argument takes on one of four possible styles:
                                :defval nil)))
         ;; only a default value
         ((s-contains-p "=" argstr)
-         (let* ((comps1 (s-split "=" argstr))
+         (let* ((comps1 (s-split-up-to "=" argstr 1))
                 (name (s-trim (car comps1)))
                 (defval (s-trim (nth 1 comps1))))
            (make-numpydoc--arg :name name
