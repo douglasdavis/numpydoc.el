@@ -203,15 +203,13 @@ The argument takes on one of four possible styles:
               ((= ichar ?\{) (setq bc (1+ bc)))
               ((= ichar ?\}) (setq bc (1- bc)))
               ((= ichar ?\") (if indquote
-                                 (progn
-                                   (setq bc (1- bc)
-                                         indquote nil))
+                                 (setq bc (1- bc)
+                                       indquote nil)
                                (setq bc (1+ bc)
                                      indquote t)))
               ((= ichar ?\') (if insquote
-                                 (progn
-                                   (setq bc (1- bc)
-                                         insquote nil))
+                                 (setq bc (1- bc)
+                                       insquote nil)
                                (setq bc (1+ bc)
                                      insquote t)))
               ((and (= ichar ?,) (= bc 0))
