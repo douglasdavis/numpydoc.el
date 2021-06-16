@@ -156,8 +156,7 @@ The argument takes on one of four possible styles:
    value. Example would be `x`."
   (cond (;; type hint and default value (or maybe a dict without a typehint)
          (and (s-contains-p ":" argstr) (s-contains-p "=" argstr))
-         (let* ((type nil)
-                (comps1 (s-split-up-to "=" argstr 1))
+         (let* ((comps1 (s-split-up-to "=" argstr 1))
                 (comps2 (s-split-up-to ":" (car comps1) 1))
                 (defval (s-trim (cadr comps1)))
                 (name (s-trim (car comps2)))
@@ -170,7 +169,7 @@ The argument takes on one of four possible styles:
               (not (s-contains-p "=" argstr)))
          (let* ((comps1 (s-split-up-to ":" argstr 1))
                 (name (s-trim (car comps1)))
-                (type (s-trim (nth 1 comps1))))
+                (type (s-trim (cadr comps1))))
            (make-numpydoc--arg :name name
                                :type type
                                :defval nil)))
@@ -178,7 +177,7 @@ The argument takes on one of four possible styles:
         ((s-contains-p "=" argstr)
          (let* ((comps1 (s-split-up-to "=" argstr 1))
                 (name (s-trim (car comps1)))
-                (defval (s-trim (nth 1 comps1))))
+                (defval (s-trim (cadr comps1))))
            (make-numpydoc--arg :name name
                                :type nil
                                :defval defval)))
