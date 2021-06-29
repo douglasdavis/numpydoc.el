@@ -2,7 +2,6 @@
 
 [![MELPA](https://melpa.org/packages/numpydoc-badge.svg)](https://melpa.org/#/numpydoc)
 [![CI](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml/badge.svg)](https://github.com/douglasdavis/numpydoc.el/actions/workflows/ci.yml)
-[![builds.sr.ht status](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml.svg)](https://builds.sr.ht/~ddavis/numpydoc.el/commits/.build.yml?)
 
 An Emacs Lisp package to automatically insert [NumPy style
 docstrings](https://numpydoc.readthedocs.io/en/latest/format.html) in
