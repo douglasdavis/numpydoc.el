@@ -62,7 +62,8 @@ writing this), so you may want to give yourself a convenient shortcut:
 
 ## Customization
 
-See inside Emacs with <kbd>M-x customize-group RET numpydoc</kbd>
+View customizations without leaving Emacs via <kbd>M-x customize-group
+RET numpydoc</kbd>
 
 <dl>
   <dt>numpydoc-insertion-style</dt>
