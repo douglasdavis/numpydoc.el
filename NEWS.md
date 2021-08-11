@@ -8,7 +8,7 @@
   commas surrounded by either quotes (strings), braces (dict or set),
   or parentheses (tuples) were causing bad docstrings. Default
   dictionaries with colons were also causing bad docstrings. (Issue
-  raised at GH#7, fixed at GH#8).
+  raised at #7, fixed at #8).
 
 ## 0.4 (May 23, 2021)
 
