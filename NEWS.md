@@ -1,5 +1,9 @@
 # numpydoc.el NEWS -- history of user visible changes
 
+## Unreleased
+
+...
+
 ## 0.5 (Aug 11, 2021)
 
 ### Fixed bugs
