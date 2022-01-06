@@ -448,7 +448,7 @@ This function assumes the cursor to be in the function body."
                         (cond (fnret fnret)
                               ((numpydoc--prompt-p) (read-string "Return type: "))
                               ((numpydoc--yas-p) numpydoc--yas-replace-pat)
-                              (t numpydoc-template-arg-desc)))
+                              (t numpydoc-template-type-desc)))
       (insert "\n")
       (numpydoc--insert indent
                         (concat (make-string 4 ?\s)
