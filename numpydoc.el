@@ -96,6 +96,11 @@ body has raise statements."
   :group 'numpydoc
   :type 'boolean)
 
+(defcustom numpydoc-insert-return-without-typehint nil
+  "Flag to control inserting a Return block if a type hint is absent."
+  :group 'numpydoc
+  :type 'boolean)
+
 (defcustom numpydoc-template-short "FIXME: Short description."
   "Template text for the short description in a docstring."
   :group 'numpydoc
@@ -434,12 +439,16 @@ This function assumes the cursor to be in the function body."
   "Insert FNRET (return) description (if exists) at INDENT level."
   (let ((tmpr (cond ((numpydoc--yas-p) numpydoc--yas-replace-pat)
                     (t numpydoc-template-arg-desc))))
-    (when (and fnret (not (string= fnret "None")))
+    (when (or numpydoc-insert-return-without-typehint
+              (and fnret (not (string= fnret "None"))))
       (insert "\n")
       (numpydoc--insert indent
                         "Returns\n"
                         "-------\n"
-                        fnret)
+                        (cond (fnret fnret)
+                              ((numpydoc--prompt-p) (read-string "Return type: "))
+                              ((numpydoc--yas-p) numpydoc--yas-replace-pat)
+                              (t numpydoc-template-type-desc)))
       (insert "\n")
       (numpydoc--insert indent
                         (concat (make-string 4 ?\s)

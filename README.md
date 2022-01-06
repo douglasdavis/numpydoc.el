@@ -103,6 +103,11 @@ RET numpydoc</kbd>
   If <code>t</code> (the default) a Raises bock will be added to the
   docstring if exceptions are detected in the function body.
   </dd>
+  <dt>numpydoc-insert-return-without-typehint</dt>
+  <dd>
+  If <code>t</code> a Returns block will be inserted in the absence of
+  a return type hint.
+  </dd>
   <dt>numpydoc-template-short</dt>
   <dd>
   Template text that will be used as the short description if
