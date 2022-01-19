@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-...
+..
+
+## 0.6 (Jan 19, 2021)
+
+### Changes
+
+- Added the ability to include a `Returns` block when a return
+  typehint is not present
+  ([#11](https://github.com/douglasdavis/numpydoc.el/pull/11)).
 
 ## 0.5 (Aug 11, 2021)
 
