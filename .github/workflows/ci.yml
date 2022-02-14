@@ -19,7 +19,6 @@ jobs:
           - 25.3
           - 26.3
           - 27.2
-          - snapshot
 
     steps:
     - name: Setup GNU Emacs
