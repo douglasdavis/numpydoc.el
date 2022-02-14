@@ -1,6 +1,6 @@
 ;;; numpydoc.el --- NumPy style docstring insertion -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2021  Doug Davis
+;; Copyright (C) 2021-2022 Doug Davis
 
 ;; Author: Doug Davis <ddavis@ddavis.io>
 ;; Maintainer: Doug Davis <ddavis@ddavis.io>
