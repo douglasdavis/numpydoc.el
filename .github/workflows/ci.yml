@@ -6,7 +6,7 @@ on:
     - '**.md'
   pull_request:
     paths-ignore:
-      - '**.md'
+    - '**.md'
 
 jobs:
   build:
@@ -14,11 +14,11 @@ jobs:
     strategy:
       matrix:
         emacs_version:
-          - 25.1
-          - 25.2
-          - 25.3
-          - 26.3
-          - 27.2
+        - 25.1
+        - 25.2
+        - 25.3
+        - 26.3
+        - 27.2
 
     steps:
     - name: Setup GNU Emacs
