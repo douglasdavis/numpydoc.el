@@ -154,11 +154,11 @@ With `numpydoc-insertion-style` set to `nil`; before:
 def plot_histogram(
     x: np.ndarray,
     bins: int = 10,
-    range: Optional[Tuple[float, float]] = None,
-    weights: Optional[np.ndarray] = None,
+    range: tuple[float, float] | None = None,
+    weights: np.ndarray | None = None,
     flow: bool = False,
-    ax: Optional[plt.Axes] = None,
-) -> Tuple[plt.Figure, plt.Axes]:
+    ax: plt.Axes | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
     if weights is not None:
         if weights.shape != np.shape:
             raise ValueError("x and weights must have same shape.")
@@ -171,11 +171,11 @@ After <kbd>M-x numpydoc-generate</kbd>:
 def plot_histogram(
     x: np.ndarray,
     bins: int = 10,
-    range: Optional[Tuple[float, float]] = None,
-    weights: Optional[np.ndarray] = None,
+    range: tuple[float, float] | None = None,
+    weights: np.ndarray | None = None,
     flow: bool = False,
-    ax: Optional[plt.Axes] = None,
-) -> Tuple[plt.Figure, plt.Axes]:
+    ax: plt.Axes | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
     """FIXME: Short description.
 
     FIXME: Long description.
@@ -186,18 +186,18 @@ def plot_histogram(
         FIXME: Add docs.
     bins : int
         FIXME: Add docs.
-    range : Optional[Tuple[float, float]]
+    range : tuple[float, float] | None
         FIXME: Add docs.
-    weights : Optional[np.ndarray]
+    weights : np.ndarray | None
         FIXME: Add docs.
     flow : bool
         FIXME: Add docs.
-    ax : Optional[plt.Axes]
+    ax : plt.Axes | None
         FIXME: Add docs.
 
     Returns
     -------
-    Tuple[plt.Figure, plt.Axes]
+    tuple[plt.Figure, plt.Axes]
         FIXME: Add docs.
 
     Raises
