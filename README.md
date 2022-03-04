@@ -186,9 +186,9 @@ def plot_histogram(
         FIXME: Add docs.
     bins : int
         FIXME: Add docs.
-    range : tuple[float, float] | None
+    range : tuple[float, float], optional
         FIXME: Add docs.
-    weights : np.ndarray | None
+    weights : np.ndarray, optional
         FIXME: Add docs.
     flow : bool
         FIXME: Add docs.
