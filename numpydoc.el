@@ -148,6 +148,9 @@ text, and below the Examples section."
 (defun numpydoc--yas-p ()
   (eq numpydoc-insertion-style 'yas))
 
+(defun numpydoc--none-to-optional (type)
+  (replace-regexp-in-string (rx " | None" eos) ", optional" type t t))
+
 (defun numpydoc--arg-str-to-struct (argstr)
   "Convert ARGSTR to an instance of `numpydoc--arg'.
 The argument takes on one of four possible styles:
@@ -167,7 +170,9 @@ The argument takes on one of four possible styles:
                 (name (s-trim (car comps2)))
                 (type (cadr comps2)))
            (make-numpydoc--arg :name name
-                               :type (if type (s-trim type) nil)
+                               :type (if type
+                                         (numpydoc--none-to-optional (s-trim type))
+                                       nil)
                                :defval defval)))
         ;; only a typehint
         ((and (string-match-p ":" argstr)
@@ -176,7 +181,7 @@ The argument takes on one of four possible styles:
                 (name (s-trim (car comps1)))
                 (type (s-trim (cadr comps1))))
            (make-numpydoc--arg :name name
-                               :type type
+                               :type (numpydoc--none-to-optional type)
                                :defval nil)))
         ;; only a default value
         ((s-contains-p "=" argstr)
