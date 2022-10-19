@@ -4,6 +4,13 @@
 
 ..
 
+## 0.7 (March 4, 2022)
+
+### Changes
+
+- Replace instances of ` | None` with `, optional` in the argument
+  type of docstring.
+
 ## 0.6 (Jan 19, 2022)
 
 ### Changes
