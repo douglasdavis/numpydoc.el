@@ -266,7 +266,7 @@ This function assumes the cursor to be in the function body."
                                                           rawsig))))))
            ;; function args as a list of structures (remove some special cases)
            (args (-remove (lambda (x)
-                            (-contains-p (list "" "self" "*" "/")
+                            (-contains-p (list "" "self" "cls" "*" "*args" "**kwargs" "/")
                                          (numpydoc--arg-name x)))
                           (-map #'numpydoc--arg-str-to-struct rawargs)))
            ;; look for exceptions in the function body
