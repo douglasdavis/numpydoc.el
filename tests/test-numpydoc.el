@@ -147,21 +147,21 @@ def func_with_ignored_args(
         (expect jj :to-equal (nth 9 args))))
   (it "Checks arg parsing for ignored param names"
     (let* ((numpydoc-ignored-params (list "self" "*args" "**kwargs"))
-          (self (make-numpydoc--arg :name "self"
-                                  :type nil
-                                  :defval nil))
-          (a1 (make-numpydoc--arg :name "a1"
-                                  :type "int"
-                                  :defval nil))
-          (a2 (make-numpydoc--arg :name "a2"
-                                  :type "str"
-                                  :defval nil))
-          (pyargs (make-numpydoc--arg :name "*args"
-                                  :type nil
-                                  :defval nil))
-          (kwargs (make-numpydoc--arg :name "**kwargs"
-                                  :type nil
-                                  :defval nil))
+           (self (make-numpydoc--arg :name "self"
+                                     :type nil
+                                     :defval nil))
+           (a1 (make-numpydoc--arg :name "a1"
+                                   :type "int"
+                                   :defval nil))
+           (a2 (make-numpydoc--arg :name "a2"
+                                   :type "str"
+                                   :defval nil))
+           (pyargs (make-numpydoc--arg :name "*args"
+                                       :type nil
+                                       :defval nil))
+           (kwargs (make-numpydoc--arg :name "**kwargs"
+                                       :type nil
+                                       :defval nil))
 
           (args (numpydoc--def-args (numpydoc--parse-def fsig-ignored-args))))
       (expect a1 :to-equal (car args))
