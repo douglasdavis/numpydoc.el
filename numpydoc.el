@@ -127,6 +127,12 @@ text, and below the Examples section."
   :group 'numpydoc
   :type 'string)
 
+(defcustom numpydoc-ignored-params (list "" "self" "cls" "*" "*args" "**kwargs" "/")
+  "All function parameters with names listed here will be ignored
+when generating a docstring."
+  :group 'numpydoc
+  :type '(repeat string))
+
 ;;; package implementation code.
 
 (cl-defstruct numpydoc--def
@@ -266,7 +272,7 @@ This function assumes the cursor to be in the function body."
                                                           rawsig))))))
            ;; function args as a list of structures (remove some special cases)
            (args (-remove (lambda (x)
-                            (-contains-p (list "" "self" "cls" "*" "*args" "**kwargs" "/")
+                            (-contains-p numpydoc-ignored-params
                                          (numpydoc--arg-name x)))
                           (-map #'numpydoc--arg-str-to-struct rawargs)))
            ;; look for exceptions in the function body

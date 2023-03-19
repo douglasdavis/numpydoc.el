@@ -130,6 +130,11 @@ RET numpydoc</kbd>
   description if <code>numpydoc-insertion-style</code> is
   <code>nil</code>.
   </dd>
+  <dt>numpydoc-ignored-params</dt>
+  <dd>
+  All function parameters with names listed here will be ignored
+  when generating a docstring.
+  </dd>
 </dl>
 
 ## Examples
