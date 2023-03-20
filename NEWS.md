@@ -1,5 +1,9 @@
 # numpydoc.el NEWS -- history of user visible changes
 
+## Unreleased
+
+...
+
 ## 0.8 (March 20, 2023)
 
 ### Changes
