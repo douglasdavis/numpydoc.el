@@ -1,8 +1,12 @@
 # numpydoc.el NEWS -- history of user visible changes
 
-## Unreleased
+## 0.8 (March 20, 2023)
 
-..
+### Changes
+
+- Add support for customizing ignored function arguments (function
+  `Parameters` section). Contributed by
+  [@pakelly](https://github.com/pakelley) in #13.
 
 ## 0.7 (March 4, 2022)
 
