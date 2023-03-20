@@ -52,6 +52,14 @@ def f(
     hh: str = \"str, str, str, str\",
     ii: tuple[int, ...] = (4, 6),
     jj: str = \"str,str\",
+)")
+        (fsig-ignored-args "\
+def func_with_ignored_args(
+    self,
+    a1: int,
+    a2: str,
+    *args,
+    **kwargs,
 )"))
   (it "Checks arg parsing 1"
     (let ((a (make-numpydoc--arg :name "a" :type "int" :defval nil))
@@ -136,7 +144,31 @@ def f(
         (expect gg :to-equal (nth 6 args))
         (expect hh :to-equal (nth 7 args))
         (expect ii :to-equal (nth 8 args))
-        (expect jj :to-equal (nth 9 args)))))
+        (expect jj :to-equal (nth 9 args))))
+  (it "Checks arg parsing for ignored param names"
+    (let* ((numpydoc-ignored-params (list "self" "*args" "**kwargs"))
+           (self (make-numpydoc--arg :name "self"
+                                     :type nil
+                                     :defval nil))
+           (a1 (make-numpydoc--arg :name "a1"
+                                   :type "int"
+                                   :defval nil))
+           (a2 (make-numpydoc--arg :name "a2"
+                                   :type "str"
+                                   :defval nil))
+           (pyargs (make-numpydoc--arg :name "*args"
+                                       :type nil
+                                       :defval nil))
+           (kwargs (make-numpydoc--arg :name "**kwargs"
+                                       :type nil
+                                       :defval nil))
+
+          (args (numpydoc--def-args (numpydoc--parse-def fsig-ignored-args))))
+      (expect a1 :to-equal (car args))
+      (expect a2 :to-equal (nth 1 args))
+      (expect args :not :to-contain self)
+      (expect args :not :to-contain pyargs)
+      (expect args :not :to-contain kwargs))))
 
 (provide 'test-numpydoc)
 ;;; test-numpydoc.el ends here
