@@ -9,8 +9,10 @@
 ### Changes
 
 - Add support for customizing ignored function arguments (function
-  `Parameters` section). Contributed by
-  [@pakelly](https://github.com/pakelley) in #13.
+  `Parameters` section) with new `defcustom`:
+  `numpydoc-ignored-params`. Contributed by
+  [@pakelly](https://github.com/pakelley) in
+  [#13](https://github.com/douglasdavis/numpydoc.el/pull/13).
 
 ## 0.7 (March 4, 2022)
 
