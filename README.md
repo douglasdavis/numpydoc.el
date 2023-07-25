@@ -135,6 +135,11 @@ RET numpydoc</kbd>
   All function parameters with names listed here will be ignored
   when generating a docstring.
   </dd>
+  <dt>numpydoc-auto-fill-paragraphs</dt>
+  <dd>
+  If <code>t</code> text that is inserted in a prompt will be
+  automatically paragraph-filled.
+  </dd>
 </dl>
 
 ## Examples

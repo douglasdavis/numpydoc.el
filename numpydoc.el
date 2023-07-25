@@ -6,7 +6,7 @@
 ;; Maintainer: Doug Davis <ddavis@ddavis.io>
 ;; URL: https://github.com/douglasdavis/numpydoc.el
 ;; SPDX-License-Identifier: GPL-3.0-or-later
-;; Version: 0.8
+;; Version: 0.9
 ;; Package-Requires: ((emacs "25.1") (s "1.12.0") (dash "2.18.0"))
 ;; Keywords: convenience
 
@@ -132,6 +132,13 @@ text, and below the Examples section."
 when generating a docstring."
   :group 'numpydoc
   :type '(repeat string))
+
+(defcustom numpydoc-auto-fill-paragraphs t
+  "Flag to control automatic paragraph filling.
+If set to t text that is inserted in a prompt will be automatically
+paragraph-filled."
+  :group 'numpydoc
+  :type 'boolean)
 
 ;;; package implementation code.
 
@@ -391,7 +398,8 @@ This function assumes the cursor to be in the function body."
           (unless (string-empty-p ld)
             (insert "\n")
             (numpydoc--insert indent ld)
-            (numpydoc--fill-last-insertion)
+            (when numpydoc-auto-fill-paragraphs
+              (numpydoc--fill-last-insertion))
             (insert "\n")))
       (insert "\n")
       (numpydoc--insert indent tmpl)
@@ -429,7 +437,8 @@ This function assumes the cursor to be in the function body."
                                                element))
                         tmpd))))
     (numpydoc--insert indent desc)
-    (numpydoc--fill-last-insertion)
+    (when numpydoc-auto-fill-paragraphs
+      (numpydoc--fill-last-insertion))
     (insert "\n")))
 
 (defun numpydoc--insert-parameters (indent fnargs)
@@ -466,7 +475,8 @@ This function assumes the cursor to be in the function body."
                                 (if (numpydoc--prompt-p)
                                     (read-string "Description for return: ")
                                   tmpr)))
-      (numpydoc--fill-last-insertion)
+      (when numpydoc-auto-fill-paragraphs
+        (numpydoc--fill-last-insertion))
       (insert "\n"))))
 
 (defun numpydoc--insert-exceptions (indent fnexcepts)

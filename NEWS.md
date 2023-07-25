@@ -1,8 +1,13 @@
 # numpydoc.el NEWS -- history of user visible changes
 
-## Unreleased
+## 0.9 (July 24, 2023)
 
-...
+### Changes
+
+- Add new `defcustom`: `numpydoc-auto-fill-paragraphs`, which when set
+  to `t` (the default) will enable automatic paragraph filling for
+  (somewhat) long descriptions.
+  ([#16](https://github.com/douglasdavis/numpydoc.el/pull/16)).
 
 ## 0.8 (March 20, 2023)
 
