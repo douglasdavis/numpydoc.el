@@ -24,6 +24,7 @@
 
 - Replace instances of ` | None` with `, optional` in the argument
   type of docstring.
+  ([#16](https://github.com/douglasdavis/numpydoc.el/pull/16)).
 
 ## 0.6 (Jan 19, 2022)
 
