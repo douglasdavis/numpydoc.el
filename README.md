@@ -137,8 +137,8 @@ RET numpydoc</kbd>
   </dd>
   <dt>numpydoc-auto-fill-paragraphs</dt>
   <dd>
-  If `t` text that is inserted in a prompt will be automatically
-  paragraph-filled.
+  If <code>t</t> text that is inserted in a prompt will be
+  automatically paragraph-filled.
   </dd>
 </dl>
 
