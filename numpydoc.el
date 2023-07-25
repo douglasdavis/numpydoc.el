@@ -133,6 +133,13 @@ when generating a docstring."
   :group 'numpydoc
   :type '(repeat string))
 
+(defcustom numpydoc-auto-fill-paragraphs t
+  "Flag to control automatic paragraph filling.
+If set to t text that is inserted in a prompt will be automatically
+paragraph-filled."
+  :group 'numpydoc
+  :type 'boolean)
+
 ;;; package implementation code.
 
 (cl-defstruct numpydoc--def
@@ -391,7 +398,8 @@ This function assumes the cursor to be in the function body."
           (unless (string-empty-p ld)
             (insert "\n")
             (numpydoc--insert indent ld)
-            (numpydoc--fill-last-insertion)
+            (when numpydoc-auto-fill-paragraphs
+              (numpydoc--fill-last-insertion))
             (insert "\n")))
       (insert "\n")
       (numpydoc--insert indent tmpl)
@@ -429,7 +437,8 @@ This function assumes the cursor to be in the function body."
                                                element))
                         tmpd))))
     (numpydoc--insert indent desc)
-    (numpydoc--fill-last-insertion)
+    (when numpydoc-auto-fill-paragraphs
+      (numpydoc--fill-last-insertion))
     (insert "\n")))
 
 (defun numpydoc--insert-parameters (indent fnargs)
@@ -466,7 +475,8 @@ This function assumes the cursor to be in the function body."
                                 (if (numpydoc--prompt-p)
                                     (read-string "Description for return: ")
                                   tmpr)))
-      (numpydoc--fill-last-insertion)
+      (when numpydoc-auto-fill-paragraphs
+        (numpydoc--fill-last-insertion))
       (insert "\n"))))
 
 (defun numpydoc--insert-exceptions (indent fnexcepts)

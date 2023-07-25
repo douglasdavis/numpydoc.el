@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-...
+### Changes
+
+- Add new `defcustom`: `numpydoc-auto-fill-paragraphs`, which when set
+  to `t` (the default) will enable automatic paragraph filling for
+  (somewhat) long descriptions.
 
 ## 0.8 (March 20, 2023)
 
