@@ -287,9 +287,7 @@ This function assumes the cursor to be in the function body."
                  ;; look for exceptions in the function body
                  (exceptions (numpydoc--find-exceptions)))
             (make-numpydoc--def :args args :rtype rtype :raises exceptions)))
-      (error
-       (message
-        "Failed to parse function signature (bad Python syntax).")))))
+      (error "Failed to parse function signature (bad Python syntax)."))))
 
 (defun numpydoc--has-existing-docstring-p ()
   "Check for an existing docstring.
