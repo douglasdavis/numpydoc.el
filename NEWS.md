@@ -1,5 +1,12 @@
 # numpydoc.el NEWS -- history of user visible changes
 
+## Unreleased
+
+### Changes
+
+- Emit a useful warning if function signature parsing fails
+  ([#18](https://github.com/douglasdavis/numpydoc.el/pull/18)).
+
 ## 0.9 (July 24, 2023)
 
 ### Changes

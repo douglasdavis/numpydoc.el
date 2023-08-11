@@ -256,35 +256,38 @@ This function assumes the cursor to be in the function body."
 (defun numpydoc--parse-def (buffer-substr)
   "Parse the BUFFER-SUBSTR; return instance of numpydoc--def."
   (save-excursion
-    (let* ((fnsig buffer-substr)
-           ;; trimmed string of the function signature
-           (trimmed (s-collapse-whitespace fnsig))
-           ;; split into parts (args and return type)
-           (parts (s-split "->" trimmed))
-           ;; raw return
-           (rawret (if (nth 1 parts)
-                       (s-trim (nth 1 parts))
-                     nil))
-           ;; save return type as a string (or nil)
-           (rtype (when rawret
-                    (substring rawret 0 (1- (length rawret)))))
-           ;; raw signature without return type as a string
-           (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
-                         (t (substring (s-trim (car parts)) 0 -2))))
-           ;; function args as strings
-           (rawargs (-map #'s-trim
-                          (numpydoc--split-args
-                           (substring rawsig
-                                      (1+ (string-match-p (regexp-quote "(")
-                                                          rawsig))))))
-           ;; function args as a list of structures (remove some special cases)
-           (args (-remove (lambda (x)
-                            (-contains-p numpydoc-ignored-params
-                                         (numpydoc--arg-name x)))
-                          (-map #'numpydoc--arg-str-to-struct rawargs)))
-           ;; look for exceptions in the function body
-           (exceptions (numpydoc--find-exceptions)))
-      (make-numpydoc--def :args args :rtype rtype :raises exceptions))))
+    (condition-case nil
+        (progn
+          (let* ((fnsig buffer-substr)
+                 ;; trimmed string of the function signature
+                 (trimmed (s-collapse-whitespace fnsig))
+                 ;; split into parts (args and return type)
+                 (parts (s-split "->" trimmed))
+                 ;; raw return
+                 (rawret (if (nth 1 parts)
+                             (s-trim (nth 1 parts))
+                           nil))
+                 ;; save return type as a string (or nil)
+                 (rtype (when rawret
+                          (substring rawret 0 (1- (length rawret)))))
+                 ;; raw signature without return type as a string
+                 (rawsig (cond (rtype (substring (s-trim (car parts)) 0 -1))
+                               (t (substring (s-trim (car parts)) 0 -2))))
+                 ;; function args as strings
+                 (rawargs (-map #'s-trim
+                                (numpydoc--split-args
+                                 (substring rawsig
+                                            (1+ (string-match-p (regexp-quote "(")
+                                                                rawsig))))))
+                 ;; function args as a list of structures (remove some special cases)
+                 (args (-remove (lambda (x)
+                                  (-contains-p numpydoc-ignored-params
+                                               (numpydoc--arg-name x)))
+                                (-map #'numpydoc--arg-str-to-struct rawargs)))
+                 ;; look for exceptions in the function body
+                 (exceptions (numpydoc--find-exceptions)))
+            (make-numpydoc--def :args args :rtype rtype :raises exceptions)))
+      (error "Failed to parse function signature (bad Python syntax)."))))
 
 (defun numpydoc--has-existing-docstring-p ()
   "Check for an existing docstring.
